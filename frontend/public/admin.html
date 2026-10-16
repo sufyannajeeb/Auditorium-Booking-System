@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Auditorium Admin Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+
+  <style>
+:root {
+  --bg: #0e0b14; --bg2: #14101c; --panel: #1a1524; --panel2: #221b2f;
+  --ink: #f3eef8; --mut: #9a91ab; --bd: #2d2540;
+  --gold: #d4a24c; --gold2: #f0c978; --wine: #9b1c31; --wine2: #c02a45;
+  --green: #34d399; --amber: #fbbf24; --red: #f87171; --blue: #60a5fa;
+  --shadow: 0 10px 30px rgba(0,0,0,.35); --radius: 14px;
+  --hover: rgba(255,255,255,.04);
+}
+[data-theme="light"] {
+  --bg: #f6f2ec; --bg2: #efe9e0; --panel: #ffffff; --panel2: #faf6ef;
+  --ink: #231a2e; --mut: #7a6f88; --bd: #e8dfd1;
+  --gold: #b8801f; --gold2: #b8801f;
+  --shadow: 0 10px 30px rgba(60,40,20,.10);
+  --hover: rgba(60,40,20,.04);
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: 'Inter', Arial, sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(1000px 500px at 85% -10%, rgba(155,28,49,.18), transparent 60%),
+    radial-gradient(800px 400px at 0% 100%, rgba(212,162,76,.08), transparent 60%),
+    var(--bg);
+  background-attachment: fixed;
+  transition: background .3s, color .3s;
+}
+a { color: var(--gold2); }
+h1, h2, h3 { margin: 0; }
+button {
+  font-family: inherit;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  color: #2a1a05; border: 0; padding: 10px 16px; border-radius: 10px;
+  cursor: pointer; font-size: 14px; font-weight: 600;
+  transition: transform .15s, box-shadow .15s, opacity .15s, background .15s;
+}
+button:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(212,162,76,.3); }
+button:disabled { opacity: .5; cursor: not-allowed; }
+button.secondary { background: var(--panel2); color: var(--ink); border: 1px solid var(--bd); }
+button.secondary:hover:not(:disabled) { border-color: var(--gold); color: var(--gold2); box-shadow: none; }
+button.danger { background: rgba(248,113,113,.12); color: var(--red); border: 1px solid rgba(248,113,113,.3); }
+button.danger:hover:not(:disabled) { background: var(--red); color: #fff; box-shadow: none; }
+button.sm { padding: 7px 12px; font-size: 12px; border-radius: 8px; }
+button.icon-btn { width: 40px; height: 40px; padding: 0; font-size: 17px; border-radius: 12px; }
+
+input, select, textarea {
+  width: 100%; padding: 11px 13px; border: 1px solid var(--bd); border-radius: 10px;
+  font: inherit; font-size: 14px; margin-top: 6px; background: var(--bg2); color: var(--ink);
+  transition: border-color .15s, box-shadow .15s;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(212,162,76,.18);
+}
+select option { background: var(--panel); color: var(--ink); }
+label {
+  display: block; margin-bottom: 14px; font-size: 12px; font-weight: 600;
+  letter-spacing: .04em; text-transform: uppercase; color: var(--mut);
+}
+
+/* ---------- Layout ---------- */
+.app { display: flex; min-height: 100vh; }
+aside {
+  width: 262px;
+  background: linear-gradient(180deg, #2a0f1b 0%, #170c1f 55%, #0f0a17 100%);
+  color: #fff; padding: 22px 16px; flex-shrink: 0; display: flex; flex-direction: column;
+  position: sticky; top: 0; height: 100vh; border-right: 1px solid rgba(212,162,76,.15); z-index: 40;
+  transition: width .25s ease, transform .25s ease;
+  overflow: hidden;
+}
+.brand-mark { display: flex; align-items: center; gap: 12px; margin: 0 0 24px 4px; white-space: nowrap; }
+.brand-icon {
+  width: 40px; height: 40px; border-radius: 12px; flex-shrink: 0; display: grid; place-items: center;
+  font-family: 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 20px; color: #2a1a05;
+  background: linear-gradient(135deg, #d4a24c, #f0c978); box-shadow: 0 6px 16px rgba(212,162,76,.35);
+}
+aside h3 {
+  margin: 0; font-family: 'Playfair Display', Georgia, serif; font-size: 19px;
+  background: linear-gradient(135deg, #f0c978, #d4a24c); -webkit-background-clip: text;
+  background-clip: text; color: transparent;
+}
+.brand-mark small { color: #9d8fb3; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; }
+.side-nav { display: flex; flex-direction: column; }
+aside button {
+  width: 100%; justify-content: flex-start; margin-bottom: 6px; padding: 11px 12px;
+  background: transparent; color: #d9cde6; font-weight: 500; position: relative; white-space: nowrap;
+}
+aside button.active,
+aside button:hover:not(:disabled) {
+  background: linear-gradient(90deg, rgba(212,162,76,.22), rgba(212,162,76,.04));
+  color: var(--gold2); transform: none; box-shadow: none;
+}
+aside button.active::before {
+  content: ''; position: absolute; left: -16px; top: 8px; bottom: 8px; width: 4px;
+  border-radius: 0 4px 4px 0; background: var(--gold);
+}
+.nav-icon { width: 22px; text-align: center; flex-shrink: 0; }
+.nav-count {
+  margin-left: auto; font-size: 11px; padding: 2px 8px; border-radius: 20px;
+  background: rgba(212,162,76,.18); color: var(--gold2);
+}
+#logoutButton { margin-top: auto; background: rgba(248,113,113,.12); color: #fca5a5; border: 1px solid rgba(248,113,113,.25); }
+#logoutButton:hover { background: var(--red) !important; color: #fff !important; }
+
+body.collapsed aside { width: 78px; }
+body.collapsed .label, body.collapsed .brand-text, body.collapsed .nav-count { display: none; }
+body.collapsed aside button { justify-content: center; }
+body.collapsed aside button.active::before { left: -16px; }
+
+.main-wrap { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.topbar {
+  position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 12px;
+  padding: 14px 28px; backdrop-filter: blur(14px);
+  background: color-mix(in srgb, var(--bg) 78%, transparent);
+  border-bottom: 1px solid var(--bd);
+}
+.topbar .crumb { display: flex; flex-direction: column; line-height: 1.2; }
+.topbar .crumb small { color: var(--mut); font-size: 12px; }
+.topbar .crumb b { font-family: 'Playfair Display', Georgia, serif; font-size: 19px; }
+.topbar .spacer { flex: 1; }
+.clock { color: var(--mut); font-size: 13px; font-variant-numeric: tabular-nums; text-align: right; line-height: 1.3; }
+.clock b { display: block; color: var(--ink); font-size: 15px; }
+.avatar {
+  width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; font-weight: 700;
+  background: linear-gradient(135deg, var(--wine), var(--wine2)); color: #fff; border: 2px solid var(--gold);
+}
+#menuToggle { background: var(--panel2); color: var(--ink); border: 1px solid var(--bd); }
+#backdrop { display: none; }
+
+main { flex: 1; padding: 26px 28px 40px; min-width: 0; animation: fadeUp .35s ease; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.top { display: flex; justify-content: space-between; align-items: center; gap: 14px; margin-bottom: 20px; flex-wrap: wrap; }
+.top h2 { font-family: 'Playfair Display', Georgia, serif; font-size: 26px; }
+.top small { display: block; color: var(--mut); font-size: 13px; margin-top: 4px; }
+.card {
+  background: var(--panel); border: 1px solid var(--bd); border-radius: 14px; padding: 18px;
+  box-shadow: var(--shadow); overflow-x: auto; margin-bottom: 16px;
+}
+
+/* ---------- Stats ---------- */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 15px; margin-bottom: 18px; }
+.stat-card {
+  display: flex; gap: 14px; align-items: center; padding: 16px; border-radius: 14px;
+  background: var(--panel); border: 1px solid var(--bd); box-shadow: var(--shadow);
+  transition: transform .2s, border-color .2s;
+}
+.stat-card:hover { transform: translateY(-3px); border-color: var(--gold); }
+.stat-icon { font-size: 26px; width: 48px; height: 48px; border-radius: 14px; background: var(--panel2); display: grid; place-items: center; flex-shrink: 0; }
+.stats small { color: var(--mut); text-transform: uppercase; letter-spacing: .05em; font-size: 11px; font-weight: 600; }
+.stats b { display: block; font-size: 28px; margin-top: 4px; }
+
+.hero-banner { display: grid; grid-template-columns: 1.3fr auto; gap: 18px; align-items: center; padding: 24px; background: linear-gradient(135deg, rgba(155,28,49,.25), rgba(212,162,76,.08)); border: 1px solid var(--bd); border-radius: 18px; margin-bottom: 20px; position: relative; overflow: hidden; }
+.hero-banner::after { content: '🎭'; position: absolute; right: 24px; bottom: -22px; font-size: 120px; opacity: .06; pointer-events: none; }
+.hero-kicker { color: var(--gold2); text-transform: uppercase; letter-spacing: .12em; font-size: 12px; font-weight: 700; }
+.hero-banner h1 { font-family: 'Playfair Display', Georgia, serif; font-size: clamp(26px, 4vw, 38px); margin: 8px 0; }
+.hero-banner p { color: var(--mut); line-height: 1.6; max-width: 700px; margin: 0; }
+.hero-actions { display: flex; gap: 10px; flex-wrap: wrap; position: relative; z-index: 1; }
+
+.dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; margin-bottom: 18px; }
+.dashboard-panel { margin-bottom: 0; }
+.panel-head { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; margin-bottom: 14px; flex-wrap: wrap; }
+.panel-head h3 { margin: 0; font-size: 17px; }
+.panel-head span { color: var(--mut); font-size: 13px; }
+.quick-actions { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.mini-table th, .mini-table td { font-size: 13px; }
+.status-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+.status-list li { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--bd); border-radius: 10px; background: var(--panel2); }
+.status-list span { color: var(--mut); }
+.status-list b { color: var(--gold2); }
+.pulse { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--green); margin-right: 8px; animation: pulse 1.8s infinite; }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(52,211,153,.6); } 70% { box-shadow: 0 0 0 8px rgba(52,211,153,0); } 100% { box-shadow: 0 0 0 0 rgba(52,211,153,0); } }
+.welcome-card { background: linear-gradient(135deg, rgba(212,162,76,.08), rgba(155,28,49,.08)); }
+
+/* ---------- Charts ---------- */
+.donut-wrap { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+.donut { width: 140px; height: 140px; flex-shrink: 0; }
+.donut text { fill: var(--ink); }
+.legend { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; font-size: 13px; }
+.legend li { display: flex; align-items: center; gap: 8px; }
+.legend i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+.legend b { margin-left: auto; padding-left: 14px; }
+.bars { display: flex; align-items: flex-end; gap: 12px; height: 150px; padding-top: 10px; }
+.bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 6px; }
+.bar-col .bar {
+  width: 100%; max-width: 38px; border-radius: 8px 8px 0 0; min-height: 3px;
+  background: linear-gradient(180deg, var(--gold2), var(--wine)); transition: height .6s ease;
+}
+.bar-col span { font-size: 11px; color: var(--mut); }
+.bar-col em { font-style: normal; font-size: 11px; font-weight: 700; }
+.hbar { margin-bottom: 12px; }
+.hbar-top { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 5px; gap: 10px; }
+.hbar-top span { color: var(--mut); }
+.hbar-track { height: 8px; border-radius: 8px; background: var(--panel2); overflow: hidden; }
+.hbar-fill { height: 100%; border-radius: 8px; background: linear-gradient(90deg, var(--wine), var(--gold)); transition: width .7s ease; }
+
+/* ---------- Tables / toolbar ---------- */
+.toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; }
+.search-box { position: relative; flex: 1; min-width: 200px; max-width: 360px; }
+.search-box input { margin: 0; padding-left: 38px; }
+.search-box::before { content: '🔍'; position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 14px; opacity: .7; }
+.search-box kbd {
+  position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 11px; color: var(--mut);
+  border: 1px solid var(--bd); border-radius: 6px; padding: 1px 6px; background: var(--panel2);
+}
+.chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip { background: var(--panel2); color: var(--mut); border: 1px solid var(--bd); padding: 7px 13px; border-radius: 20px; font-size: 12px; text-transform: capitalize; }
+.chip:hover:not(:disabled) { color: var(--gold2); border-color: var(--gold); box-shadow: none; }
+.chip.on { background: linear-gradient(135deg, var(--gold), var(--gold2)); color: #2a1a05; border-color: transparent; }
+.toolbar .spacer { flex: 1; }
+
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { text-align: left; padding: 12px 10px; border-bottom: 1px solid var(--bd); vertical-align: middle; }
+th { color: var(--mut); font-size: 12px; text-transform: uppercase; letter-spacing: .04em; font-weight: 600; white-space: nowrap; }
+th.sortable { cursor: pointer; user-select: none; }
+th.sortable:hover { color: var(--gold2); }
+th .arrow { opacity: .35; margin-left: 4px; font-size: 10px; }
+th.sorted .arrow { opacity: 1; color: var(--gold2); }
+tbody tr { transition: background .15s; }
+tbody tr:hover { background: var(--hover); }
+.table-wrap { overflow-x: auto; }
+.actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; background: rgba(255,255,255,.08); color: var(--ink); text-transform: capitalize; }
+.badge.active, .badge.booked, .badge.upcoming, .badge.user { background: rgba(52,211,153,.15); color: var(--green); }
+.badge.inactive, .badge.cancelled { background: rgba(248,113,113,.15); color: var(--red); }
+.badge.pending, .badge.ongoing, .badge.admin { background: rgba(251,191,36,.15); color: var(--amber); }
+.badge.completed { background: rgba(96,165,250,.15); color: var(--blue); }
+.notice { color: var(--mut); padding: 20px 0; }
+.empty { text-align: center; padding: 40px 10px !important; color: var(--mut); }
+.empty big { display: block; font-size: 38px; margin-bottom: 8px; }
+
+.pager { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 14px; color: var(--mut); font-size: 13px; }
+.pager .pages { display: flex; gap: 6px; }
+.pager button { padding: 6px 11px; font-size: 12px; border-radius: 8px; }
+
+.skeleton { border-radius: 10px; background: linear-gradient(90deg, var(--panel2) 25%, var(--bd) 50%, var(--panel2) 75%); background-size: 200% 100%; animation: shimmer 1.3s infinite; }
+@keyframes shimmer { to { background-position: -200% 0; } }
+.sk-row { height: 44px; margin-bottom: 10px; }
+.sk-stat { height: 82px; }
+
+/* ---------- Modal / toast ---------- */
+.modal { position: fixed; inset: 0; background: rgba(0,0,0,.6); backdrop-filter: blur(3px); display: flex; align-items: center; justify-content: center; padding: 15px; z-index: 80; animation: fade .2s; }
+.modal[hidden] { display: none; }
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+.modal-box {
+  background: var(--panel); border: 1px solid var(--bd); color: var(--ink);
+  padding: 22px; border-radius: 14px; width: 100%; max-width: 560px;
+  max-height: 90vh; overflow: auto; box-shadow: var(--shadow); animation: pop .22s ease;
+}
+@keyframes pop { from { transform: scale(.95) translateY(8px); opacity: 0; } to { transform: none; opacity: 1; } }
+.modal-box h3 { margin-bottom: 14px; font-family: 'Playfair Display', Georgia, serif; font-size: 22px; }
+.modal-box img { max-width: 100%; border-radius: 8px; }
+.detail-table th { width: 38%; color: var(--mut); }
+.detail-table td { color: var(--ink); }
+.preview-img { display: block; width: 100%; max-height: 180px; object-fit: cover; border-radius: 10px; margin-top: 8px; }
+.confirm-box { max-width: 420px; text-align: center; }
+.confirm-box .ico { font-size: 40px; margin-bottom: 6px; }
+.confirm-box p { color: var(--mut); line-height: 1.5; }
+.confirm-box .actions { justify-content: center; margin-top: 16px; }
+
+#toasts { position: fixed; right: 20px; bottom: 20px; z-index: 100; display: grid; gap: 10px; }
+.toast {
+  min-width: 240px; max-width: 360px; padding: 12px 16px; border-radius: 12px; font-size: 14px;
+  background: var(--panel); border: 1px solid var(--bd); border-left: 4px solid var(--gold);
+  box-shadow: var(--shadow); animation: slideIn .3s ease; display: flex; gap: 10px; align-items: center;
+}
+.toast.success { border-left-color: var(--green); }
+.toast.error { border-left-color: var(--red); }
+.toast.out { opacity: 0; transform: translateX(30px); transition: .3s; }
+@keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: none; } }
+
+@media (max-width: 960px) {
+  .topbar { padding: 12px 16px; }
+  .clock { display: none; }
+}
+@media (max-width: 760px) {
+  aside { position: fixed; left: 0; top: 0; transform: translateX(-100%); width: 262px !important; }
+  body.drawer aside { transform: none; }
+  body.drawer #backdrop { display: block; position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 35; }
+  body.collapsed .label, body.collapsed .brand-text { display: inline; }
+  body.collapsed aside button { justify-content: flex-start; }
+  main { padding: 16px; }
+  #collapseToggle { display: none; }
+  #toasts { left: 16px; right: 16px; }
+}
+@media (min-width: 761px) { #menuToggle { display: none; } }
+@media (max-width: 720px) { .hero-banner { grid-template-columns: 1fr; } .quick-actions { grid-template-columns: 1fr; } }
+  </style>
+</head>
+
+<body>
+  <div class="app" id="app" hidden>
+    <aside>
+      <div class="brand-mark">
+        <span class="brand-icon">A</span>
+        <div class="brand-text">
+          <h3>Auditorium Admin</h3>
+          <small>Management Console</small>
+        </div>
+      </div>
+      <nav class="side-nav">
+        <button data-page="dashboard"><span class="nav-icon">📊</span><span class="label">Dashboard</span></button>
+        <button data-page="auditoriums"><span class="nav-icon">🏛️</span><span class="label">Auditoriums</span><span class="nav-count" id="cnt-auditoriums"></span></button>
+        <button data-page="users"><span class="nav-icon">👥</span><span class="label">Users</span><span class="nav-count" id="cnt-users"></span></button>
+        <button data-page="events"><span class="nav-icon">📅</span><span class="label">Events</span><span class="nav-count" id="cnt-events"></span></button>
+        <button data-page="bookings"><span class="nav-icon">🎟️</span><span class="label">Bookings</span><span class="nav-count" id="cnt-bookings"></span></button>
+      </nav>
+      <button id="logoutButton"><span class="nav-icon">🚪</span><span class="label">Logout</span></button>
+    </aside>
+    <div id="backdrop"></div>
+
+    <div class="main-wrap">
+      <header class="topbar">
+        <button class="icon-btn" id="menuToggle" title="Menu">☰</button>
+        <button class="icon-btn secondary" id="collapseToggle" title="Collapse sidebar">⇤</button>
+        <div class="crumb">
+          <small>Admin / <span id="crumbSection">Dashboard</span></small>
+          <b id="crumbTitle">Dashboard</b>
+        </div>
+        <div class="spacer"></div>
+        <div class="clock"><b id="clockTime">--:--</b><span id="clockDate"></span></div>
+        <button class="icon-btn secondary" id="themeToggle" title="Toggle theme">🌙</button>
+        <div class="avatar" title="Administrator">AD</div>
+      </header>
+
+      <main id="view">
+        <p class="notice">Loading dashboard...</p>
+      </main>
+    </div>
+  </div>
+
+  <div class="modal" id="modal" hidden>
+    <div class="modal-box" id="modalContent"></div>
+  </div>
+  <div id="toasts"></div>
+
+  <script>
+    // Backend URL
+    const API = 'http://localhost:5000';
+
+    let token = localStorage.getItem('tok');
+    let currentPage = 'dashboard';
+    let records = [];
+
+    // Table view state (search / filter / sort / pagination)
+    const view = { q: '', filter: 'all', sort: null, dir: 1, page: 1, size: 8 };
+
+    const $ = selector => document.querySelector(selector);
+
+    const escapeHTML = value =>
+      String(value ?? '').replace(/[&<>"']/g, char => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      })[char]);
+
+    const dateText = value =>
+      value ? new Date(value).toLocaleDateString() : '';
+
+    function imageURL(path) {
+      if (!path) return '';
+      return /^https?:\/\//i.test(path)
+        ? path
+        : API + (path.startsWith('/') ? path : '/' + path);
+    }
+
+    function imageHTML(record) {
+      if (!record.image) return '';
+      return `<img src="${escapeHTML(imageURL(record.image))}"
+        width="44" height="44"
+        style="object-fit:cover;border-radius:8px"
+        alt="Record image">`;
+    }
+
+    function statusBadge(status) {
+      const safeStatus = String(status ?? '');
+      return `<span class="badge ${escapeHTML(safeStatus)}">${escapeHTML(safeStatus || '-')}</span>`;
+    }
+
+    /* ---------- Toasts ---------- */
+    function toast(message, type = 'info') {
+      const icons = { success: '✅', error: '⚠️', info: 'ℹ️' };
+      const el = document.createElement('div');
+      el.className = 'toast ' + type;
+      el.innerHTML = `<span>${icons[type] || icons.info}</span><span>${escapeHTML(message)}</span>`;
+      $('#toasts').appendChild(el);
+      setTimeout(() => {
+        el.classList.add('out');
+        setTimeout(() => el.remove(), 320);
+      }, 3200);
+    }
+
+    /* ---------- Theme / sidebar / clock ---------- */
+    function applyTheme(theme) {
+      if (theme === 'light') document.documentElement.setAttribute('data-theme', 'light');
+      else document.documentElement.removeAttribute('data-theme');
+      $('#themeToggle').textContent = theme === 'light' ? '☀️' : '🌙';
+      localStorage.setItem('theme', theme);
+    }
+
+    function tickClock() {
+      const now = new Date();
+      $('#clockTime').textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      $('#clockDate').textContent = now.toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short' });
+    }
+
+    /* ---------- Config ---------- */
+    // columns: [label, renderHTML, sortValue(optional)]
+    const config = {
+      auditoriums: {
+        title: 'Auditoriums',
+        subtitle: 'Venues available for booking',
+        filter: ['status', ['active', 'inactive']],
+        fields: [
+          ['auditoriumName', 'Auditorium name'],
+          ['location', 'Location'],
+          ['capacity', 'Capacity', 'number'],
+          ['pricePerDay', 'Price per day', 'number'],
+          ['status', 'Status', 'select', ['active', 'inactive']],
+          ['facilities', 'Facilities (comma separated)'],
+          ['image', 'Image', 'file']
+        ],
+        columns: [
+          ['', r => imageHTML(r)],
+          ['Name', r => escapeHTML(r.auditoriumName), r => r.auditoriumName],
+          ['Location', r => escapeHTML(r.location), r => r.location],
+          ['Capacity', r => escapeHTML(r.capacity), r => Number(r.capacity)],
+          ['Price/day', r => '₹' + escapeHTML(r.pricePerDay), r => Number(r.pricePerDay)],
+          ['Status', r => statusBadge(r.status), r => r.status]
+        ]
+      },
+
+      users: {
+        title: 'Users',
+        subtitle: 'Registered accounts and administrators',
+        filter: ['usertype', ['user', 'admin']],
+        fields: [
+          ['name', 'Name'],
+          ['email', 'Email', 'email'],
+          ['phoneNumber', 'Phone number'],
+          ['address', 'Address'],
+          ['username', 'Username'],
+          ['password', 'Password', 'password'],
+          ['usertype', 'User type', 'select', ['user', 'admin']]
+        ],
+        columns: [
+          ['Name', r => escapeHTML(r.name), r => r.name],
+          ['Email', r => escapeHTML(r.email), r => r.email],
+          ['Phone', r => escapeHTML(r.phoneNumber), r => r.phoneNumber],
+          ['Username', r => escapeHTML(r.username), r => r.username],
+          ['Type', r => statusBadge(r.usertype), r => r.usertype]
+        ]
+      },
+
+      events: {
+        title: 'Events',
+        subtitle: 'Shows, conferences and programmes',
+        filter: ['status', ['upcoming', 'ongoing', 'completed', 'cancelled']],
+        fields: [
+          ['eventName', 'Event name'],
+          ['description', 'Description', 'textarea'],
+          ['organizer', 'Organizer'],
+          ['eventDate', 'Event date', 'date'],
+          ['price', 'Ticket price', 'number'],
+          ['seats', 'Total seats', 'number'],
+          ['image', 'Image', 'file'],
+          ['status', 'Status', 'select',
+            ['upcoming', 'ongoing', 'completed', 'cancelled']]
+        ],
+        columns: [
+          ['', r => imageHTML(r)],
+          ['Event', r => escapeHTML(r.eventName), r => r.eventName],
+          ['Organizer', r => escapeHTML(r.organizer), r => r.organizer],
+          ['Date', r => escapeHTML(r.eventDate ? dateText(r.eventDate) : '-'), r => r.eventDate],
+          ['Price', r => r.price != null ? '₹' + escapeHTML(r.price) : '-', r => Number(r.price) || 0],
+          ['Seats', r => escapeHTML(r.seats ?? '-'), r => Number(r.seats) || 0],
+          ['Status', r => statusBadge(r.status), r => r.status]
+        ]
+      },
+
+      bookings: {
+        title: 'Bookings',
+        subtitle: 'All reservations made by users',
+        filter: ['status', ['booked', 'pending', 'cancelled']],
+        fields: [],
+        columns: [
+          ['User', r => escapeHTML(r.userId?.name || '-'), r => r.userId?.name],
+          ['Auditorium', r => escapeHTML(r.auditoriumId?.auditoriumName || '-'), r => r.auditoriumId?.auditoriumName],
+          ['Event', r => escapeHTML(r.eventId?.eventName || '-'), r => r.eventId?.eventName],
+          ['Date', r => escapeHTML(dateText(r.bookingDate)), r => new Date(r.bookingDate).getTime() || 0],
+          ['Time', r => escapeHTML(r.time), r => r.time],
+          ['People', r => escapeHTML(r.noOfPeople), r => Number(r.noOfPeople)],
+          ['Status', r => statusBadge(r.status), r => r.status]
+        ]
+      }
+    };
+
+    async function api(endpoint, options = {}) {
+      const headers = {
+        Authorization: 'Bearer ' + token,
+        ...(options.headers || {})
+      };
+
+      // FormData sets its own Content-Type boundary.
+      const response = await fetch(API + '/api/' + endpoint, {
+        ...options,
+        headers
+      });
+
+      const result = await response.json().catch(() => ({}));
+
+      if (response.status === 401 || response.status === 403) {
+        throw new Error(result.message || 'Access denied. Please log in again.');
+      }
+
+      if (!response.ok) {
+        throw new Error(result.message || `Request failed (${response.status})`);
+      }
+
+      return result;
+    }
+
+    function logout() {
+      localStorage.removeItem('tok');
+      localStorage.removeItem('usertype');
+      token = null;
+      window.location.href = '/';
+    }
+
+    function extractRecords(result) {
+      if (Array.isArray(result)) return result;
+      if (Array.isArray(result.records)) return result.records;
+      if (Array.isArray(result.data)) return result.data;
+      if (Array.isArray(result.users)) return result.users;
+      if (Array.isArray(result.auditoriums)) return result.auditoriums;
+      if (Array.isArray(result.events)) return result.events;
+      if (Array.isArray(result.bookings)) return result.bookings;
+      return [];
+    }
+
+    async function start() {
+      applyTheme(localStorage.getItem('theme') || 'dark');
+      if (localStorage.getItem('collapsed') === '1') document.body.classList.add('collapsed');
+      tickClock();
+      setInterval(tickClock, 30000);
+
+      const usertype = localStorage.getItem('usertype');
+
+      if (!token || usertype !== 'admin') {
+        $('#view').innerHTML = `
+          <div class="card">
+            <h2>Admin login required</h2>
+            <p>Please log in using an administrator account.</p>
+            <button onclick="window.location.href='/'">Go to Login</button>
+          </div>`;
+        $('#app').hidden = false;
+        return;
+      }
+
+      $('#app').hidden = false;
+      await showPage('dashboard');
+    }
+
+    /* ---------- Helpers for charts / animation ---------- */
+    function countUp() {
+      document.querySelectorAll('[data-count]').forEach(el => {
+        const target = Number(el.dataset.count) || 0;
+        const start = performance.now();
+        const duration = 800;
+        const step = now => {
+          const t = Math.min((now - start) / duration, 1);
+          el.textContent = Math.round(target * (1 - Math.pow(1 - t, 3)));
+          if (t < 1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+      });
+    }
+
+    function donutChart(segments) {
+      const total = segments.reduce((sum, s) => sum + s.value, 0);
+      const r = 46, c = 2 * Math.PI * r;
+      let offset = 0;
+      const arcs = total
+        ? segments.filter(s => s.value > 0).map(s => {
+            const len = (s.value / total) * c;
+            const arc = `<circle cx="60" cy="60" r="${r}" fill="none" stroke="${s.color}" stroke-width="16"
+              stroke-dasharray="${len} ${c - len}" stroke-dashoffset="${-offset}" transform="rotate(-90 60 60)"></circle>`;
+            offset += len;
+            return arc;
+          }).join('')
+        : '';
+      return `
+        <div class="donut-wrap">
+          <svg class="donut" viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="${r}" fill="none" stroke="var(--panel2)" stroke-width="16"></circle>
+            ${arcs}
+            <text x="60" y="58" text-anchor="middle" font-size="20" font-weight="700">${total}</text>
+            <text x="60" y="74" text-anchor="middle" font-size="9" style="fill:var(--mut)">TOTAL</text>
+          </svg>
+          <ul class="legend">
+            ${segments.map(s => `<li><i style="background:${s.color}"></i>${escapeHTML(s.label)}<b>${s.value}</b></li>`).join('')}
+          </ul>
+        </div>`;
+    }
+
+    function monthlyBars(bookings) {
+      const months = [];
+      const now = new Date();
+      for (let i = 5; i >= 0; i--) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        months.push({ y: d.getFullYear(), m: d.getMonth(), label: d.toLocaleDateString([], { month: 'short' }), count: 0 });
+      }
+      bookings.forEach(b => {
+        const d = new Date(b.bookingDate);
+        if (isNaN(d)) return;
+        const slot = months.find(x => x.y === d.getFullYear() && x.m === d.getMonth());
+        if (slot) slot.count++;
+      });
+      const max = Math.max(1, ...months.map(m => m.count));
+      return `<div class="bars">
+        ${months.map(m => `
+          <div class="bar-col">
+            <em>${m.count}</em>
+            <div class="bar" style="height:${Math.max(3, (m.count / max) * 100)}%"></div>
+            <span>${escapeHTML(m.label)}</span>
+          </div>`).join('')}
+      </div>`;
+    }
+
+    function capacityBars(auditoriums) {
+      const top = [...auditoriums]
+        .sort((a, b) => Number(b.capacity || 0) - Number(a.capacity || 0))
+        .slice(0, 5);
+      if (!top.length) return '<p class="notice">No auditoriums yet.</p>';
+      const max = Math.max(1, ...top.map(a => Number(a.capacity || 0)));
+      return top.map(a => `
+        <div class="hbar">
+          <div class="hbar-top"><b>${escapeHTML(a.auditoriumName)}</b><span>${escapeHTML(a.capacity)} seats</span></div>
+          <div class="hbar-track"><div class="hbar-fill" style="width:${(Number(a.capacity || 0) / max) * 100}%"></div></div>
+        </div>`).join('');
+    }
+
+    function skeleton(kind) {
+      if (kind === 'dashboard') {
+        return `<div class="skeleton" style="height:140px;margin-bottom:20px"></div>
+          <div class="stats">${Array(8).fill('<div class="skeleton sk-stat"></div>').join('')}</div>
+          <div class="dashboard-grid">${Array(3).fill('<div class="skeleton" style="height:240px"></div>').join('')}</div>`;
+      }
+      return `<div class="skeleton" style="height:40px;width:220px;margin-bottom:20px"></div>
+        <div class="card">${Array(6).fill('<div class="skeleton sk-row"></div>').join('')}</div>`;
+    }
+
+    function setNavCounts(map) {
+      Object.entries(map).forEach(([key, value]) => {
+        const el = $('#cnt-' + key);
+        if (el) el.textContent = value;
+      });
+    }
+
+    /* ---------- Pages ---------- */
+    async function showPage(page) {
+      currentPage = page;
+      Object.assign(view, { q: '', filter: 'all', sort: null, dir: 1, page: 1 });
+      document.body.classList.remove('drawer');
+
+      document.querySelectorAll('aside button[data-page]').forEach(button => {
+        button.classList.toggle('active', button.dataset.page === page);
+      });
+
+      const pageTitle = page === 'dashboard' ? 'Dashboard' : (config[page]?.title || 'Dashboard');
+      $('#crumbSection').textContent = pageTitle;
+      $('#crumbTitle').textContent = pageTitle;
+
+      $('#view').innerHTML = skeleton(page === 'dashboard' ? 'dashboard' : 'table');
+
+      try {
+        if (page === 'dashboard') {
+          const [auditoriums, users, events, bookings] = await Promise.all([
+            api('auditoriums'),
+            api('users'),
+            api('events'),
+            api('bookings')
+          ]);
+
+          const auditoriumRecords = extractRecords(auditoriums);
+          const userRecords = extractRecords(users);
+          const eventRecords = extractRecords(events);
+          const bookingRecords = extractRecords(bookings);
+
+          setNavCounts({
+            auditoriums: auditoriumRecords.length,
+            users: userRecords.length,
+            events: eventRecords.length,
+            bookings: bookingRecords.length
+          });
+
+          const countBy = (list, key, val) => list.filter(item => item[key] === val).length;
+
+          const stats = [
+            ['Total Auditoriums', auditoriumRecords.length, '🏛️', 'var(--gold2)'],
+            ['Active Auditoriums', countBy(auditoriumRecords, 'status', 'active'), '✅', 'var(--green)'],
+            ['Total Users', userRecords.length, '👥', 'var(--blue)'],
+            ['Administrator Accounts', countBy(userRecords, 'usertype', 'admin'), '🛡️', 'var(--amber)'],
+            ['Total Events', eventRecords.length, '📅', 'var(--gold2)'],
+            ['Total Bookings', bookingRecords.length, '🎟️', 'var(--green)'],
+            ['Confirmed Bookings', countBy(bookingRecords, 'status', 'booked'), '📌', 'var(--green)'],
+            ['Cancelled Bookings', countBy(bookingRecords, 'status', 'cancelled'), '⚠️', 'var(--red)']
+          ];
+
+          const booked = countBy(bookingRecords, 'status', 'booked');
+          const pending = countBy(bookingRecords, 'status', 'pending');
+          const cancelled = countBy(bookingRecords, 'status', 'cancelled');
+          const other = Math.max(0, bookingRecords.length - booked - pending - cancelled);
+
+          const recentBookings = bookingRecords.slice(0, 5).map(record => `
+            <tr>
+              <td>${escapeHTML(record.userId?.name || '-')}</td>
+              <td>${escapeHTML(record.auditoriumId?.auditoriumName || '-')}</td>
+              <td>${escapeHTML(dateText(record.bookingDate))}</td>
+              <td>${statusBadge(record.status)}</td>
+            </tr>
+          `).join('');
+
+          const hour = new Date().getHours();
+          const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+
+          $('#view').innerHTML = `
+            <div class="hero-banner">
+              <div>
+                <span class="hero-kicker">Administrator Control Center</span>
+                <h1>${greeting}, Administrator</h1>
+                <p>Monitor bookings, manage resources, and keep every event workflow running smoothly from one place.</p>
+              </div>
+              <div class="hero-actions">
+                <button onclick="showPage('auditoriums')">Manage Auditoriums</button>
+                <button class="secondary" onclick="showPage('bookings')">View Bookings</button>
+              </div>
+            </div>
+
+            <div class="stats">
+              ${stats.map(([title, count, icon, color]) => `
+                <div class="stat-card">
+                  <div class="stat-icon" style="color:${color}">${icon}</div>
+                  <div>
+                    <small>${escapeHTML(title)}</small>
+                    <b style="color:${color}" data-count="${Number(count)}">0</b>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+
+            <div class="dashboard-grid">
+              <section class="card dashboard-panel">
+                <div class="panel-head">
+                  <h3>Booking Status</h3>
+                  <span>Distribution</span>
+                </div>
+                ${donutChart([
+                  { label: 'Booked', value: booked, color: '#34d399' },
+                  { label: 'Pending', value: pending, color: '#fbbf24' },
+                  { label: 'Cancelled', value: cancelled, color: '#f87171' },
+                  { label: 'Other', value: other, color: '#60a5fa' }
+                ])}
+              </section>
+
+              <section class="card dashboard-panel">
+                <div class="panel-head">
+                  <h3>Bookings per Month</h3>
+                  <span>Last 6 months</span>
+                </div>
+                ${monthlyBars(bookingRecords)}
+              </section>
+
+              <section class="card dashboard-panel">
+                <div class="panel-head">
+                  <h3>Largest Venues</h3>
+                  <span>By seating capacity</span>
+                </div>
+                ${capacityBars(auditoriumRecords)}
+              </section>
+            </div>
+
+            <div class="dashboard-grid">
+              <section class="card dashboard-panel">
+                <div class="panel-head">
+                  <h3>Quick Actions</h3>
+                  <span>Manage core records instantly</span>
+                </div>
+                <div class="quick-actions">
+                  <button onclick="quickAdd('auditoriums')">+ Add Auditorium</button>
+                  <button class="secondary" onclick="showPage('users')">Manage Users</button>
+                  <button class="secondary" onclick="quickAdd('events')">Create Event</button>
+                  <button class="secondary" onclick="showPage('bookings')">Review Bookings</button>
+                </div>
+              </section>
+
+              <section class="card dashboard-panel">
+                <div class="panel-head">
+                  <h3>Recent Bookings</h3>
+                  <span>Latest reservation activity</span>
+                </div>
+                <div class="table-wrap">
+                  <table class="mini-table">
+                    <thead>
+                      <tr><th>User</th><th>Auditorium</th><th>Date</th><th>Status</th></tr>
+                    </thead>
+                    <tbody>
+                      ${recentBookings || '<tr><td colspan="4">No bookings yet.</td></tr>'}
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+
+              <section class="card dashboard-panel">
+                <div class="panel-head">
+                  <h3>System Status</h3>
+                  <span>Platform overview</span>
+                </div>
+                <ul class="status-list">
+                  <li><span>Backend API</span><b><i class="pulse"></i>Online</b></li>
+                  <li><span>Admin Session</span><b>Active</b></li>
+                  <li><span>Active Venues</span><b>${countBy(auditoriumRecords, 'status', 'active')}</b></li>
+                  <li><span>Upcoming Events</span><b>${countBy(eventRecords, 'status', 'upcoming')}</b></li>
+                  <li><span>Confirmed Bookings</span><b>${booked}</b></li>
+                </ul>
+              </section>
+            </div>
+
+            <div class="card welcome-card">
+              <h3>Welcome, Administrator!</h3>
+              <p>Use the sidebar or quick actions to manage auditoriums, users, events and bookings. Every change is synced directly with the backend API.</p>
+            </div>`;
+          countUp();
+          return;
+        }
+
+        const entity = config[page];
+        if (!entity) throw new Error('Invalid page');
+
+        const result = await api(page);
+        records = extractRecords(result);
+        setNavCounts({ [page]: records.length });
+
+        const filterChips = entity.filter
+          ? ['all', ...entity.filter[1]].map(option =>
+              `<button class="chip ${option === 'all' ? 'on' : ''}" data-filter="${escapeHTML(option)}">${escapeHTML(option)}</button>`
+            ).join('')
+          : '';
+
+        $('#view').innerHTML = `
+          <div class="top">
+            <div>
+              <h2>${escapeHTML(entity.title)}</h2>
+              <small>${escapeHTML(entity.subtitle)}</small>
+            </div>
+            ${page !== 'bookings'
+              ? '<button onclick="editRecord()">+ Add New</button>'
+              : ''}
+          </div>
+          <div class="card">
+            <div class="toolbar">
+              <div class="search-box">
+                <input id="searchInput" type="search" placeholder="Search ${escapeHTML(entity.title.toLowerCase())}..." autocomplete="off">
+                <kbd>/</kbd>
+              </div>
+              <div class="chips" id="chips">${filterChips}</div>
+              <div class="spacer"></div>
+              <button class="secondary sm" onclick="exportCSV()">⬇ Export CSV</button>
+            </div>
+            <div id="tableArea"></div>
+          </div>`;
+
+        $('#searchInput').addEventListener('input', event => {
+          view.q = event.target.value.trim().toLowerCase();
+          view.page = 1;
+          renderTable();
+        });
+
+        $('#chips').addEventListener('click', event => {
+          const chip = event.target.closest('[data-filter]');
+          if (!chip) return;
+          view.filter = chip.dataset.filter;
+          view.page = 1;
+          document.querySelectorAll('#chips .chip').forEach(c => c.classList.toggle('on', c === chip));
+          renderTable();
+        });
+
+        renderTable();
+      } catch (error) {
+        $('#view').innerHTML = `
+          <div class="card">
+            <h2>${escapeHTML(config[page]?.title || 'Dashboard')}</h2>
+            <p style="color:var(--red)">${escapeHTML(error.message)}</p>
+            <p>Check that the backend is running and that the API route exists.</p>
+            <button onclick="showPage('${page}')">Try Again</button>
+          </div>`;
+      }
+    }
+
+    /* ---------- Table rendering ---------- */
+    function searchText(record) {
+      const copy = { ...record };
+      delete copy.password;
+      delete copy.__v;
+      return JSON.stringify(copy).toLowerCase();
+    }
+
+    function getVisibleRows() {
+      const entity = config[currentPage];
+      let rows = records.map((record, index) => ({ record, index }));
+
+      if (view.q) rows = rows.filter(row => searchText(row.record).includes(view.q));
+
+      if (view.filter !== 'all' && entity.filter) {
+        rows = rows.filter(row => row.record[entity.filter[0]] === view.filter);
+      }
+
+      if (view.sort !== null) {
+        const getter = entity.columns[view.sort][2];
+        if (getter) {
+          rows.sort((a, b) => {
+            const x = getter(a.record) ?? '';
+            const y = getter(b.record) ?? '';
+            if (typeof x === 'number' && typeof y === 'number') return (x - y) * view.dir;
+            return String(x).localeCompare(String(y), undefined, { numeric: true, sensitivity: 'base' }) * view.dir;
+          });
+        }
+      }
+      return rows;
+    }
+
+    function renderTable() {
+      const entity = config[currentPage];
+      const rows = getVisibleRows();
+      const totalPages = Math.max(1, Math.ceil(rows.length / view.size));
+      if (view.page > totalPages) view.page = totalPages;
+      const start = (view.page - 1) * view.size;
+      const pageRows = rows.slice(start, start + view.size);
+
+      const head = entity.columns.map((column, i) => {
+        const sortable = !!column[2];
+        const sorted = view.sort === i;
+        const arrow = sorted ? (view.dir === 1 ? '▲' : '▼') : '↕';
+        return `<th class="${sortable ? 'sortable' : ''} ${sorted ? 'sorted' : ''}" ${sortable ? `data-sort="${i}"` : ''}>
+          ${escapeHTML(column[0])}${sortable ? `<span class="arrow">${arrow}</span>` : ''}</th>`;
+      }).join('');
+
+      const body = pageRows.map(({ record, index }) => `
+        <tr>
+          ${entity.columns.map(column => `<td>${column[1](record)}</td>`).join('')}
+          <td>
+            <div class="actions">
+              <button class="secondary sm" onclick="viewRecord(${index})">View</button>
+              ${currentPage !== 'bookings'
+                ? `<button class="secondary sm" onclick="editRecord(${index})">Edit</button>
+                   <button class="danger sm" onclick="deleteRecord(${index})">Delete</button>`
+                : ''}
+            </div>
+          </td>
+        </tr>
+      `).join('');
+
+      const emptyMsg = records.length
+        ? 'No records match your search or filter.'
+        : 'No records found.';
+
+      const pageButtons = [];
+      for (let p = 1; p <= totalPages; p++) {
+        if (p === 1 || p === totalPages || Math.abs(p - view.page) <= 1) {
+          pageButtons.push(`<button class="${p === view.page ? '' : 'secondary'}" data-page-no="${p}">${p}</button>`);
+        } else if (pageButtons[pageButtons.length - 1] !== '<span>…</span>') {
+          pageButtons.push('<span>…</span>');
+        }
+      }
+
+      $('#tableArea').innerHTML = `
+        <div class="table-wrap">
+          <table>
+            <thead><tr>${head}<th>Actions</th></tr></thead>
+            <tbody>
+              ${body || `<tr><td class="empty" colspan="${entity.columns.length + 1}"><big>🗂️</big>${emptyMsg}</td></tr>`}
+            </tbody>
+          </table>
+        </div>
+        <div class="pager">
+          <span>${rows.length ? `Showing ${start + 1}–${Math.min(start + view.size, rows.length)} of ${rows.length}` : '0 results'}</span>
+          <div class="pages">
+            <button class="secondary" data-page-no="${view.page - 1}" ${view.page <= 1 ? 'disabled' : ''}>‹ Prev</button>
+            ${pageButtons.join('')}
+            <button class="secondary" data-page-no="${view.page + 1}" ${view.page >= totalPages ? 'disabled' : ''}>Next ›</button>
+          </div>
+        </div>`;
+
+      $('#tableArea').querySelectorAll('th[data-sort]').forEach(th => {
+        th.addEventListener('click', () => {
+          const i = Number(th.dataset.sort);
+          if (view.sort === i) view.dir *= -1;
+          else { view.sort = i; view.dir = 1; }
+          renderTable();
+        });
+      });
+
+      $('#tableArea').querySelectorAll('[data-page-no]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          view.page = Number(btn.dataset.pageNo);
+          renderTable();
+        });
+      });
+    }
+
+    function exportCSV() {
+      const rows = getVisibleRows().map(row => row.record);
+      if (!rows.length) { toast('Nothing to export', 'error'); return; }
+
+      const keys = [...new Set(rows.flatMap(r => Object.keys(r)))]
+        .filter(key => !['__v', 'password', 'image'].includes(key));
+
+      const cell = value => {
+        if (value && typeof value === 'object') {
+          value = Array.isArray(value) ? value.join('; ') : refName(value);
+        }
+        return '"' + String(value ?? '').replace(/"/g, '""') + '"';
+      };
+
+      const csv = [keys.join(','), ...rows.map(r => keys.map(k => cell(r[k])).join(','))].join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `${currentPage}-${new Date().toISOString().slice(0, 10)}.csv`;
+      link.click();
+      URL.revokeObjectURL(link.href);
+      toast(`Exported ${rows.length} record(s)`, 'success');
+    }
+
+    function refName(value) {
+      return value.name || value.auditoriumName || value.eventName || value._id || JSON.stringify(value);
+    }
+
+    /* ---------- Modal ---------- */
+    function openModal(html, extraClass = '') {
+      $('#modalContent').className = 'modal-box ' + extraClass;
+      $('#modalContent').innerHTML = html;
+      $('#modal').hidden = false;
+    }
+
+    function closeModal() {
+      $('#modal').hidden = true;
+    }
+
+    function confirmDialog(message) {
+      return new Promise(resolve => {
+        openModal(`
+          <div class="ico">🗑️</div>
+          <h3>Delete record?</h3>
+          <p>${escapeHTML(message)}</p>
+          <div class="actions">
+            <button class="secondary" id="cfNo">Cancel</button>
+            <button class="danger" id="cfYes">Yes, delete</button>
+          </div>
+        `, 'confirm-box');
+        $('#cfNo').onclick = () => { closeModal(); resolve(false); };
+        $('#cfYes').onclick = () => { closeModal(); resolve(true); };
+      });
+    }
+
+    function quickAdd(page) {
+      showPage(page).then(() => editRecord());
+    }
+
+    function viewRecord(index) {
+      const record = records[index];
+      if (!record) return;
+
+      const rows = Object.entries(record)
+        .filter(([key]) => !['_id', '__v', 'password'].includes(key))
+        .map(([key, value]) => {
+          let display;
+
+          if (key === 'image' && value) {
+            display = `<img src="${escapeHTML(imageURL(value))}" alt="Record image">`;
+          } else if (key === 'status' || key === 'usertype') {
+            display = statusBadge(value);
+          } else if (Array.isArray(value)) {
+            display = escapeHTML(value.join(', '));
+          } else if (value && typeof value === 'object') {
+            display = escapeHTML(refName(value));
+          } else {
+            display = escapeHTML(/date/i.test(key) ? dateText(value) : value);
+          }
+
+          return `<tr><th>${escapeHTML(key)}</th><td>${display ?? ''}</td></tr>`;
+        }).join('');
+
+      openModal(`
+        <h3>Record Details</h3>
+        <table class="detail-table">${rows}</table>
+        <br>
+        <button class="secondary" onclick="closeModal()">Close</button>
+      `);
+    }
+
+    function editRecord(index) {
+      const entity = config[currentPage];
+      if (!entity || currentPage === 'bookings') return;
+
+      const record = index == null ? null : records[index];
+
+      const fields = entity.fields.map(([key, label, type = 'text', options]) => {
+        let value = record && type !== 'password' && type !== 'file'
+          ? (record[key] ?? '')
+          : '';
+        if (Array.isArray(value)) value = value.join(', ');
+
+        const required = type === 'file' ||
+          (type === 'password' && record) ? '' : 'required';
+
+        let input;
+
+        if (type === 'select') {
+          input = `<select name="${key}" ${required}>
+            ${options.map(option => `
+              <option value="${escapeHTML(option)}"
+                ${option === value ? 'selected' : ''}>${escapeHTML(option)}</option>
+            `).join('')}
+          </select>`;
+        } else if (type === 'textarea') {
+          input = `<textarea name="${key}" rows="3" ${required}>${escapeHTML(value)}</textarea>`;
+        } else if (type === 'file') {
+          input = `<input name="${key}" type="file" accept="image/*" data-preview="1">
+            <img class="preview-img" id="imgPreview" alt="Preview"
+              ${record && record.image ? `src="${escapeHTML(imageURL(record.image))}"` : 'hidden'}>`;
+        } else {
+          input = `<input name="${key}" type="${type}"
+            value="${escapeHTML(value)}" ${required}
+            ${type === 'password' && record
+              ? 'placeholder="Leave blank to keep current password"' : ''}>`;
+        }
+
+        return `<label>${escapeHTML(label)}${input}</label>`;
+      }).join('');
+
+      openModal(`
+        <h3>${record ? 'Edit' : 'Add'} ${escapeHTML(entity.title.replace(/s$/, ''))}</h3>
+        <form id="recordForm" enctype="multipart/form-data">
+          ${fields}
+          <div class="actions">
+            <button type="submit" id="saveBtn">Save</button>
+            <button type="button" class="secondary" onclick="closeModal()">Cancel</button>
+          </div>
+        </form>
+      `);
+
+      const fileInput = $('#recordForm input[data-preview]');
+      if (fileInput) {
+        fileInput.addEventListener('change', () => {
+          const file = fileInput.files[0];
+          const preview = $('#imgPreview');
+          if (file) {
+            preview.src = URL.createObjectURL(file);
+            preview.hidden = false;
+          }
+        });
+      }
+
+      $('#recordForm').onsubmit = async event => {
+        event.preventDefault();
+
+        const formData = new FormData(event.target);
+
+        if (record && currentPage === 'users' && !formData.get('password')) {
+          formData.delete('password');
+        }
+
+        const file = formData.get('image');
+        if (file instanceof File && !file.name) {
+          formData.delete('image');
+        }
+
+        // Convert the facilities field to an array if your schema uses an array.
+        if (currentPage === 'auditoriums' && formData.has('facilities')) {
+          const facilities = String(formData.get('facilities') || '')
+            .split(',')
+            .map(item => item.trim())
+            .filter(Boolean);
+          formData.set('facilities', JSON.stringify(facilities));
+        }
+
+        const saveBtn = $('#saveBtn');
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Saving...';
+
+        try {
+          const endpoint = currentPage +
+            (record ? '/' + record._id : '');
+
+          await api(endpoint, {
+            method: record ? 'PUT' : 'POST',
+            body: formData
+          });
+
+          closeModal();
+          toast(record ? 'Record updated' : 'Record created', 'success');
+          await showPage(currentPage);
+        } catch (error) {
+          saveBtn.disabled = false;
+          saveBtn.textContent = 'Save';
+          toast(error.message, 'error');
+        }
+      };
+    }
+
+    async function deleteRecord(index) {
+      const record = records[index];
+      if (!record) return;
+
+      const ok = await confirmDialog('This action cannot be undone. The record will be permanently removed.');
+      if (!ok) return;
+
+      try {
+        await api(currentPage + '/' + record._id, {
+          method: 'DELETE'
+        });
+        toast('Record deleted', 'success');
+        await showPage(currentPage);
+      } catch (error) {
+        toast(error.message, 'error');
+      }
+    }
+
+    /* ---------- Global listeners ---------- */
+    document.querySelectorAll('aside button[data-page]').forEach(button => {
+      button.addEventListener('click', () => showPage(button.dataset.page));
+    });
+
+    $('#logoutButton').addEventListener('click', logout);
+
+    $('#themeToggle').addEventListener('click', () => {
+      applyTheme(document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light');
+    });
+
+    $('#collapseToggle').addEventListener('click', () => {
+      document.body.classList.toggle('collapsed');
+      localStorage.setItem('collapsed', document.body.classList.contains('collapsed') ? '1' : '0');
+    });
+
+    $('#menuToggle').addEventListener('click', () => document.body.classList.toggle('drawer'));
+    $('#backdrop').addEventListener('click', () => document.body.classList.remove('drawer'));
+
+    $('#modal').addEventListener('click', event => {
+      if (event.target.id === 'modal') closeModal();
+    });
+
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape') {
+        closeModal();
+        document.body.classList.remove('drawer');
+      }
+      const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName || '');
+      if (event.key === '/' && !typing) {
+        const search = $('#searchInput');
+        if (search) { event.preventDefault(); search.focus(); }
+      }
+    });
+
+    start();
+  </script>
+</body>
+</html>

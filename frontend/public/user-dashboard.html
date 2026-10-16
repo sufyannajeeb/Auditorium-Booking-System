@@ -1,0 +1,1437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Auditorium - My Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #0e0b14; --bg2: #14101c; --panel: #1a1524; --panel2: #221b2f;
+      --ink: #f3eef8; --mut: #9a91ab; --bd: #2d2540;
+      --gold: #d4a24c; --gold2: #f0c978; --wine: #9b1c31; --wine2: #c02a45;
+      --green: #34d399; --amber: #fbbf24; --red: #f87171; --blue: #60a5fa;
+      --shadow: 0 10px 30px rgba(0,0,0,.35); --radius: 14px;
+    }
+    [data-theme="light"] {
+      --bg: #f6f2ec; --bg2: #efe9e0; --panel: #ffffff; --panel2: #faf6ef;
+      --ink: #231a2e; --mut: #7a6f88; --bd: #e8dfd1;
+      --gold: #b8801f; --gold2: #d4a24c;
+      --shadow: 0 10px 30px rgba(60,40,20,.10);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0; font-family: 'Inter', Arial, sans-serif; color: var(--ink);
+      background:
+        radial-gradient(1000px 500px at 85% -10%, rgba(155,28,49,.18), transparent 60%),
+        radial-gradient(800px 400px at 0% 100%, rgba(212,162,76,.08), transparent 60%),
+        var(--bg);
+      transition: background .3s, color .3s;
+    }
+    h1, h2, h3, p { margin: 0; }
+    .serif { font-family: 'Playfair Display', Georgia, serif; }
+
+    button {
+      font-family: inherit; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      background: linear-gradient(135deg, var(--gold), var(--gold2)); color: #2a1a05;
+      border: 0; padding: 10px 16px; border-radius: 10px; cursor: pointer;
+      font-size: 14px; font-weight: 600;
+      transition: transform .15s, box-shadow .15s, opacity .15s;
+    }
+    button:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(212,162,76,.3); }
+    button:disabled { opacity: .5; cursor: not-allowed; }
+    button svg { width: 17px; height: 17px; flex-shrink: 0; }
+    button.secondary { background: var(--panel2); color: var(--ink); border: 1px solid var(--bd); }
+    button.secondary:hover:not(:disabled) { border-color: var(--gold); color: var(--gold2); box-shadow: none; }
+    button.danger { background: rgba(248,113,113,.12); color: var(--red); border: 1px solid rgba(248,113,113,.3); }
+    button.danger:hover:not(:disabled) { background: var(--red); color: #fff; box-shadow: none; }
+    button.sm { padding: 7px 12px; font-size: 12px; border-radius: 8px; }
+    button.icon { padding: 9px; }
+
+    input, select, textarea {
+      width: 100%; padding: 11px 13px; border: 1px solid var(--bd); border-radius: 10px;
+      font: inherit; font-size: 14px; margin-top: 6px; background: var(--bg2); color: var(--ink);
+      transition: border-color .15s, box-shadow .15s;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(212,162,76,.18);
+    }
+    select option { background: var(--panel); color: var(--ink); }
+    label {
+      display: block; margin-bottom: 14px; font-size: 12px; font-weight: 600;
+      letter-spacing: .04em; text-transform: uppercase; color: var(--mut);
+    }
+
+    .app { display: flex; min-height: 100vh; }
+    aside {
+      width: 262px; background: linear-gradient(180deg, #2a0f1b 0%, #170c1f 55%, #0f0a17 100%);
+      color: #fff; padding: 22px 16px; flex-shrink: 0; display: flex; flex-direction: column;
+      position: sticky; top: 0; height: 100vh; border-right: 1px solid rgba(212,162,76,.15); z-index: 20;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; padding: 4px 8px 22px; border-bottom: 1px solid rgba(255,255,255,.08); margin-bottom: 18px; }
+    .brand-logo {
+      width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, var(--gold), var(--gold2));
+      display: grid; place-items: center; color: #3a2208; box-shadow: 0 6px 18px rgba(212,162,76,.35);
+    }
+    .brand-logo svg { width: 24px; height: 24px; }
+    .brand b { font-family: 'Playfair Display', serif; font-size: 18px; display: block; line-height: 1.1; }
+    .brand small { color: #c9b8a0; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; }
+    .nav-label { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #8f7f9e; margin: 6px 10px 8px; }
+    nav { flex: 1; overflow-y: auto; }
+    aside nav button {
+      width: 100%; justify-content: flex-start; background: transparent; color: #d9cde6;
+      margin-bottom: 4px; padding: 11px 12px; font-weight: 500; position: relative;
+    }
+    aside nav button:hover { background: rgba(255,255,255,.07); color: #fff; transform: none; box-shadow: none; }
+    aside nav button.active { background: linear-gradient(90deg, rgba(212,162,76,.22), rgba(212,162,76,.04)); color: var(--gold2); }
+    aside nav button.active::before {
+      content: ''; position: absolute; left: -16px; top: 8px; bottom: 8px; width: 4px;
+      border-radius: 0 4px 4px 0; background: var(--gold);
+    }
+    .count { margin-left: auto; font-size: 11px; background: rgba(255,255,255,.1); padding: 2px 8px; border-radius: 20px; }
+    .side-foot { border-top: 1px solid rgba(255,255,255,.08); padding-top: 14px; margin-top: 10px; }
+    .me-chip { display: flex; align-items: center; gap: 10px; padding: 8px; margin-bottom: 10px; }
+    .me-chip b { font-size: 13px; display: block; word-break: break-word; }
+    .me-chip small { color: #a99bb8; font-size: 11px; }
+    #logoutButton {
+      width: 100%; background: rgba(248,113,113,.12); color: #fca5a5; border: 1px solid rgba(248,113,113,.25);
+    }
+    #logoutButton:hover { background: var(--red); color: #fff; }
+    .avatar {
+      width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), var(--gold2));
+      color: #3a2208; display: grid; place-items: center; font-weight: 700; font-size: 13px; flex-shrink: 0;
+    }
+    .avatar.wine { background: linear-gradient(135deg, var(--wine), var(--wine2)); color: #fff; }
+
+    .content { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+    header.topbar {
+      display: flex; align-items: center; gap: 14px; padding: 16px 28px; border-bottom: 1px solid var(--bd);
+      background: color-mix(in srgb, var(--bg) 82%, transparent); backdrop-filter: blur(12px);
+      position: sticky; top: 0; z-index: 10;
+    }
+    .menu-btn { display: none; }
+    .titles { flex: 1; min-width: 0; }
+    .titles h1 { font-family: 'Playfair Display', serif; font-size: 24px; }
+    .titles p { margin-top: 3px; color: var(--mut); font-size: 13px; }
+    main { padding: 26px 28px 40px; min-width: 0; animation: fade .35s ease; }
+    @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+    .card {
+      background: linear-gradient(180deg, var(--panel), var(--panel2)); border: 1px solid var(--bd);
+      border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow);
+    }
+    .card h3 { font-size: 16px; margin-bottom: 4px; }
+    .sub { color: var(--mut); font-size: 13px; margin-bottom: 16px; }
+
+    .hero {
+      background: linear-gradient(120deg, rgba(155,28,49,.85), rgba(60,15,40,.9)),
+        repeating-linear-gradient(90deg, rgba(255,255,255,.04) 0 14px, transparent 14px 28px);
+      border: 1px solid rgba(212,162,76,.3); border-radius: var(--radius); padding: 26px 28px; margin-bottom: 20px;
+      display: flex; align-items: center; justify-content: space-between; gap: 18px; flex-wrap: wrap;
+      color: #fff; box-shadow: var(--shadow);
+    }
+    .hero h2 { font-family: 'Playfair Display', serif; font-size: 26px; }
+    .hero p { margin-top: 6px; color: #f0d9de; font-size: 14px; }
+
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 18px; margin-bottom: 20px; }
+    .stat { position: relative; overflow: hidden; display: flex; align-items: center; gap: 16px; cursor: pointer; transition: transform .2s, border-color .2s; }
+    .stat:hover { transform: translateY(-3px); border-color: var(--gold); }
+    .stat::after { content: ''; position: absolute; right: -30px; top: -30px; width: 110px; height: 110px; border-radius: 50%; background: var(--tint); }
+    .stat .ico { width: 52px; height: 52px; border-radius: 14px; display: grid; place-items: center; background: var(--tint); color: var(--tc); flex-shrink: 0; z-index: 1; }
+    .stat .ico svg { width: 26px; height: 26px; }
+    .stat small { color: var(--mut); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; }
+    .stat b { display: block; font-size: 32px; font-family: 'Playfair Display', serif; margin-top: 2px; }
+
+    .grid-2 { display: grid; grid-template-columns: 1.5fr 1fr; gap: 18px; margin-bottom: 18px; }
+    .next { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+    .next .date {
+      width: 78px; height: 78px; border-radius: 16px; background: linear-gradient(135deg, var(--wine), var(--wine2));
+      color: #fff; display: grid; place-items: center; text-align: center; flex-shrink: 0;
+    }
+    .next .date b { font-family: 'Playfair Display', serif; font-size: 28px; display: block; line-height: 1; }
+    .next .date small { font-size: 11px; text-transform: uppercase; letter-spacing: .1em; }
+
+    .mini-list { display: grid; gap: 10px; }
+    .mini-item { display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: 10px; background: var(--bg2); border: 1px solid transparent; }
+    .mini-item:hover { border-color: var(--bd); }
+    .mini-item .thumb { width: 42px; height: 42px; border-radius: 10px; object-fit: cover; flex-shrink: 0; }
+    .mini-item .thumb.ph { display: grid; place-items: center; background: var(--panel2); color: var(--gold); }
+    .mini-item b { font-size: 14px; display: block; }
+    .mini-item small { color: var(--mut); font-size: 12px; }
+    .mini-item .badge { margin-left: auto; }
+
+    .toolbar { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 18px; }
+    .search { position: relative; flex: 1; min-width: 200px; max-width: 380px; }
+    .search svg { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--mut); width: 17px; height: 17px; }
+    .search input { padding-left: 40px; margin: 0; }
+    .toolbar select { width: auto; margin: 0; min-width: 150px; }
+
+    .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(285px, 1fr)); gap: 20px; }
+    .item { padding: 0; overflow: hidden; display: flex; flex-direction: column; transition: transform .2s, border-color .2s; }
+    .item:hover { transform: translateY(-4px); border-color: var(--gold); }
+    .cover { height: 165px; position: relative; background: linear-gradient(135deg, #3a1226, #1b1030); display: grid; place-items: center; color: rgba(212,162,76,.5); }
+    .cover > svg { width: 54px; height: 54px; }
+    .cover img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .cover .badge { position: absolute; top: 12px; right: 12px; background-color: rgba(14,11,20,.75); }
+    .item .body { padding: 16px 18px; flex: 1; }
+    .item h3 { font-family: 'Playfair Display', serif; font-size: 18px; margin-bottom: 8px; }
+    .meta { display: grid; gap: 6px; color: var(--mut); font-size: 13px; }
+    .meta span { display: flex; align-items: center; gap: 8px; }
+    .meta svg { color: var(--gold); flex-shrink: 0; width: 15px; height: 15px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+    .chip { font-size: 11px; padding: 3px 9px; border-radius: 20px; background: var(--bg2); border: 1px solid var(--bd); color: var(--mut); }
+    .price { color: var(--gold2); font-weight: 700; font-size: 17px; margin-top: 12px; }
+    .price small { color: var(--mut); font-weight: 400; font-size: 12px; }
+    .foot { padding: 12px 18px; border-top: 1px solid var(--bd); display: flex; gap: 8px; }
+    .foot button { flex: 1; }
+
+    .table-wrap { overflow-x: auto; padding: 0; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { text-align: left; padding: 14px 16px; border-bottom: 1px solid var(--bd); vertical-align: middle; }
+    th { color: var(--mut); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; background: color-mix(in srgb, var(--bg2) 60%, transparent); white-space: nowrap; }
+    tbody tr:hover { background: color-mix(in srgb, var(--gold) 6%, transparent); }
+    tbody tr:last-child td { border-bottom: 0; }
+    .table-foot { padding: 12px 16px; color: var(--mut); font-size: 13px; border-top: 1px solid var(--bd); }
+    .actions { display: flex; gap: 6px; flex-wrap: wrap; }
+
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px; padding: 4px 11px; border-radius: 20px;
+      font-size: 12px; font-weight: 600; background: rgba(154,145,171,.15); color: var(--mut);
+      text-transform: capitalize; white-space: nowrap;
+    }
+    .badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+    .badge.active, .badge.booked, .badge.upcoming, .badge.confirmed { background: rgba(52,211,153,.14); color: var(--green); }
+    .badge.inactive, .badge.cancelled { background: rgba(248,113,113,.14); color: var(--red); }
+    .badge.pending, .badge.ongoing { background: rgba(251,191,36,.14); color: var(--amber); }
+    .badge.completed { background: rgba(96,165,250,.14); color: var(--blue); }
+
+    .empty { text-align: center; padding: 50px 20px; color: var(--mut); }
+    .empty svg { width: 52px; height: 52px; color: var(--gold); opacity: .7; margin-bottom: 10px; }
+    .empty h3 { color: var(--ink); margin-bottom: 6px; }
+    .skel {
+      border-radius: 12px; min-height: 90px;
+      background: linear-gradient(90deg, var(--panel) 25%, var(--panel2) 50%, var(--panel) 75%);
+      background-size: 200% 100%; animation: shimmer 1.3s infinite;
+    }
+    @keyframes shimmer { to { background-position: -200% 0; } }
+
+    .modal {
+      position: fixed; inset: 0; background: rgba(6,3,12,.7); backdrop-filter: blur(5px);
+      display: flex; align-items: center; justify-content: center; padding: 15px; z-index: 50;
+    }
+    .modal[hidden] { display: none; }
+    .modal-box {
+      background: var(--panel); border: 1px solid var(--bd); color: var(--ink); padding: 26px; border-radius: 18px;
+      width: 100%; max-width: 540px; max-height: 90vh; overflow: auto; box-shadow: 0 30px 80px rgba(0,0,0,.5);
+      scrollbar-width: none; -ms-overflow-style: none; animation: pop .22s ease;
+    }
+    .modal-box::-webkit-scrollbar { width: 0; height: 0; display: none; }
+    @keyframes pop { from { opacity: 0; transform: scale(.95) translateY(10px); } to { opacity: 1; transform: none; } }
+    .modal-box h3 { font-family: 'Playfair Display', serif; font-size: 22px; margin-bottom: 6px; }
+    .modal-box .sub { margin-bottom: 18px; }
+    .modal-box img.preview { width: 100%; height: 190px; border-radius: 12px; object-fit: cover; margin-bottom: 14px; display: block; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .form-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 8px; }
+    .summary { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; border-radius: 10px; background: var(--bg2); border: 1px dashed var(--gold); margin-bottom: 14px; font-size: 14px; }
+    .summary b { color: var(--gold2); font-size: 18px; }
+    .form-err { padding: 10px 12px; border-radius: 10px; background: rgba(248,113,113,.12); color: var(--red); font-size: 13px; margin-bottom: 12px; }
+    .kv { display: grid; grid-template-columns: 120px 1fr; gap: 10px 14px; font-size: 14px; margin: 0 0 16px; }
+    .kv dt { color: var(--mut); font-size: 12px; text-transform: uppercase; letter-spacing: .06em; padding-top: 2px; }
+    .kv dd { margin: 0; word-break: break-word; }
+    .confirm-box { text-align: center; }
+    .confirm-ico { width: 56px; height: 56px; border-radius: 50%; background: rgba(248,113,113,.14); color: var(--red); display: grid; place-items: center; margin: 0 auto 14px; }
+    .confirm-ico svg { width: 28px; height: 28px; }
+    .confirm-box p { color: var(--mut); margin: 6px 0 20px; }
+    .confirm-box .form-actions { justify-content: center; }
+
+    /* Booking ticket reference + QR */
+    .ref { font-family: ui-monospace, Menlo, Consolas, monospace; letter-spacing: .12em; color: var(--gold2); }
+    .ticket { border: 1px dashed var(--bd); border-radius: 14px; padding: 16px; }
+    .ticket .qr { display: block; margin: 0 auto; background: #fff; border-radius: 12px; padding: 10px; }
+
+    /* Booking success popup with animated tick */
+    .success-box { text-align: center; }
+    .success-check { width: 96px; height: 96px; margin: 4px auto 16px; display: block; }
+    .success-check .ring {
+      stroke: var(--green); stroke-width: 4; fill: rgba(52,211,153,.12);
+      stroke-dasharray: 300; stroke-dashoffset: 300; animation: draw-ring .6s ease forwards;
+    }
+    .success-check .tick {
+      stroke: var(--green); stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; fill: none;
+      stroke-dasharray: 60; stroke-dashoffset: 60; animation: draw-tick .4s .5s ease forwards;
+    }
+    @keyframes draw-ring { to { stroke-dashoffset: 0; } }
+    @keyframes draw-tick { to { stroke-dashoffset: 0; } }
+    .success-box h3 { color: var(--ink); }
+    .success-box p { color: var(--mut); margin: 8px 0 0; }
+    .success-box .form-actions { justify-content: center; margin-top: 22px; }
+
+    .profile { display: grid; grid-template-columns: 280px 1fr; gap: 18px; align-items: start; }
+    .profile-card { text-align: center; }
+    .profile-card .big { width: 92px; height: 92px; font-size: 30px; margin: 0 auto 14px; font-family: 'Playfair Display', serif; }
+    .profile-card h3 { font-family: 'Playfair Display', serif; font-size: 20px; }
+    .profile-card p { color: var(--mut); font-size: 13px; margin-top: 4px; word-break: break-word; }
+
+    #toasts { position: fixed; right: 20px; bottom: 20px; display: grid; gap: 10px; z-index: 100; }
+    .toast {
+      background: var(--panel); color: var(--ink); border: 1px solid var(--bd); border-left: 4px solid var(--green);
+      padding: 13px 18px; border-radius: 10px; font-size: 14px; box-shadow: var(--shadow); animation: slide .3s ease; max-width: 340px;
+    }
+    .toast.error { border-left-color: var(--red); }
+    @keyframes slide { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: none; } }
+
+    .scrim { display: none; }
+    @media (max-width: 1000px) { .grid-2, .profile { grid-template-columns: 1fr; } }
+    @media (max-width: 800px) {
+      aside { position: fixed; left: 0; top: 0; bottom: 0; transform: translateX(-100%); transition: transform .28s ease; }
+      aside.open { transform: none; }
+      .scrim.show { display: block; position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 15; }
+      .menu-btn { display: inline-flex; }
+      header.topbar, main { padding-left: 16px; padding-right: 16px; }
+      .titles h1 { font-size: 20px; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app" id="app" hidden>
+    <aside id="sidebar">
+      <div class="brand">
+        <div class="brand-logo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V9a7 7 0 0 1 14 0v12"/><path d="M9 21v-7a3 3 0 0 1 6 0v7"/></svg>
+        </div>
+        <div><b>Grand Hall</b><small>Member Portal</small></div>
+      </div>
+
+      <div class="nav-label">Menu</div>
+      <nav>
+        <button data-page="dashboard"></button>
+        <button data-page="auditoriums"></button>
+        <button data-page="events"></button>
+        <button data-page="bookings"></button>
+        <button data-page="profile"></button>
+      </nav>
+
+      <div class="side-foot">
+        <div class="me-chip">
+          <span class="avatar wine" id="sideAvatar">U</span>
+          <div><b id="sideName">User</b><small>Member</small></div>
+        </div>
+        <button id="logoutButton"></button>
+      </div>
+    </aside>
+    <div class="scrim" id="scrim"></div>
+
+    <div class="content">
+      <header class="topbar">
+        <button class="secondary icon menu-btn" id="menuButton" aria-label="Menu"></button>
+        <div class="titles">
+          <h1 id="pageTitle">Dashboard</h1>
+          <p id="pageSub"></p>
+        </div>
+        <button class="secondary icon" id="themeButton" title="Toggle theme" aria-label="Toggle theme"></button>
+      </header>
+      <main id="view"><p class="sub">Loading...</p></main>
+    </div>
+  </div>
+
+  <div class="modal" id="modal" hidden>
+    <div class="modal-box" id="modalContent"></div>
+  </div>
+  <div id="toasts"></div>
+
+  <script>
+    // Backend URL
+    const API = 'http://localhost:5000';
+
+    let token = localStorage.getItem('tok');
+    let currentPage = 'dashboard';
+    let me = { id: '', name: 'User', email: '', phoneNumber: '', address: '', username: '', usertype: 'user' };
+    let data = { auditoriums: [], events: [], bookings: [], eventBookings: [] };
+    const ui = { search: '', filter: '' };
+
+    const $ = s => document.querySelector(s);
+
+    /* ---------- Icons ---------- */
+    const svg = p => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+    const ICON = {
+      dashboard: svg('<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>'),
+      auditoriums: svg('<path d="M3 21h18"/><path d="M5 21V9a7 7 0 0 1 14 0v12"/><path d="M9 21v-7a3 3 0 0 1 6 0v7"/>'),
+      events: svg('<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>'),
+      bookings: svg('<path d="M2 9a3 3 0 0 1 0 6v3a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1v-3a3 3 0 0 1 0-6V6a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1z"/><path d="M13 5v2M13 17v2M13 11v2"/>'),
+      profile: svg('<circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/>'),
+      logout: svg('<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/>'),
+      search: svg('<circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/>'),
+      menu: svg('<path d="M3 6h18M3 12h18M3 18h18"/>'),
+      moon: svg('<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>'),
+      sun: svg('<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>'),
+      pin: svg('<path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>'),
+      people: svg('<path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="10" cy="7" r="4"/>'),
+      clock: svg('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),
+      user: svg('<circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/>'),
+      warn: svg('<path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/>'),
+      empty: svg('<path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.5 5.1L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.5-6.9A2 2 0 0 0 16.7 4H7.3a2 2 0 0 0-1.8 1.1z"/>'),
+      eye: svg('<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>'),
+      x: svg('<path d="M18 6L6 18M6 6l12 12"/>'),
+      check: svg('<path d="M20 6L9 17l-5-5"/>')
+    };
+
+    /* ---------- Helpers ---------- */
+    const escapeHTML = v => String(v ?? '').replace(/[&<>"']/g, c => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    })[c]);
+
+    const lower = v => String(v ?? '').toLowerCase();
+    const idOf = v => (v && typeof v === 'object' ? v._id : v);
+    const initials = n => String(n || '?').trim().split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase();
+
+    const dateText = v => {
+      if (!v) return '-';
+      const d = new Date(v);
+      return isNaN(d) ? '-' : d.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+    };
+    const dayISO = v => String(v || '').slice(0, 10);
+    const todayISO = () => {
+      const d = new Date();
+      return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    };
+
+    function imageURL(r) {
+      if (!r || !r.image) return '';
+      return /^https?:\/\//i.test(r.image) ? r.image : API + (r.image.startsWith('/') ? r.image : '/' + r.image);
+    }
+
+    function facilitiesOf(r) {
+      const out = [];
+      const walk = v => {
+        if (Array.isArray(v)) return v.forEach(walk);
+        if (typeof v !== 'string') return;
+        const s = v.trim();
+        if (s.startsWith('[')) {
+          try { return walk(JSON.parse(s)); } catch (e) { /* treat as plain text */ }
+        }
+        s.split(',').forEach(x => { const t = x.trim(); if (t) out.push(t); });
+      };
+      walk(r && r.facilities);
+      return out;
+    }
+
+    function decodeToken() {
+      try {
+        const part = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+        return JSON.parse(atob(part));
+      } catch (e) { return {}; }
+    }
+
+    const badge = s => `<span class="badge ${escapeHTML(lower(s))}">${escapeHTML(s || '-')}</span>`;
+
+    function toast(message, type = 'success') {
+      const el = document.createElement('div');
+      el.className = 'toast ' + type;
+      el.textContent = message;
+      $('#toasts').appendChild(el);
+      setTimeout(() => el.remove(), 3500);
+    }
+
+    function coverHTML(r, icon) {
+      const url = imageURL(r);
+      return `<div class="cover">${url ? `<img src="${escapeHTML(url)}" alt="" loading="lazy">` : ICON[icon]}${r.status ? badge(r.status) : ''}</div>`;
+    }
+
+    /* ---------- API ---------- */
+    async function api(endpoint, options = {}) {
+      const response = await fetch(API + '/api/' + endpoint, {
+        ...options,
+        headers: { Authorization: 'Bearer ' + token, ...(options.headers || {}) }
+      });
+      const result = await response.json().catch(() => ({}));
+      if (response.status === 401) throw new Error(result.message || 'Session expired. Please log in again.');
+      if (!response.ok) throw new Error(result.message || 'Request failed (' + response.status + ')');
+      return result;
+    }
+
+    function extractRecords(result) {
+      if (Array.isArray(result)) return result;
+      for (const k of ['records', 'data', 'users', 'auditoriums', 'events', 'bookings']) {
+        if (Array.isArray(result && result[k])) return result[k];
+      }
+      return [];
+    }
+
+    function logout() {
+      ['tok', 'usertype', 'userId', 'id', 'name', 'user'].forEach(k => localStorage.removeItem(k));
+      token = null;
+      window.location.href = '/';
+    }
+
+    /* ---------- Data ---------- */
+    function myBookings() {
+      if (!me.id) return [];
+      return data.bookings.filter(b => String(idOf(b.userId)) === String(me.id));
+    }
+
+    function myEventTickets() {
+      return data.eventBookings;
+    }
+
+    // Number of seats still available for an event (null when unlimited/unknown)
+    function seatsLeft(e) {
+      if (!e) return null;
+      if (e.available != null) return Number(e.available);
+      const seats = Number(e.seats);
+      return seats > 0 ? seats : null;
+    }
+
+    const qrURL = text =>
+      'https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=10&data=' + encodeURIComponent(text);
+
+    async function loadAll() {
+      const endpoints = ['auditoriums', 'events', 'bookings/my', 'event-bookings/my'];
+      const res = await Promise.allSettled(endpoints.map(e => api(e)));
+      if (res.every(r => r.status === 'rejected')) throw res[0].reason;
+      data.auditoriums = res[0].status === 'fulfilled' ? extractRecords(res[0].value) : [];
+      data.events = res[1].status === 'fulfilled' ? extractRecords(res[1].value) : [];
+      data.bookings = res[2].status === 'fulfilled' ? extractRecords(res[2].value) : [];
+      data.eventBookings = res[3].status === 'fulfilled' ? extractRecords(res[3].value) : [];
+    }
+
+    async function loadProfile() {
+      const p = decodeToken();
+      let stored = null;
+      try { stored = JSON.parse(localStorage.getItem('user') || 'null'); } catch (e) { stored = null; }
+      if (!stored || typeof stored !== 'object') stored = null;
+
+      me.id = localStorage.getItem('userId') || localStorage.getItem('id') ||
+        (stored && (stored._id || stored.id)) ||
+        p.id || p._id || p.userId || (p.user && (p.user.id || p.user._id)) || '';
+      me.name = localStorage.getItem('name') || (stored && stored.name) || p.name || p.username || 'User';
+      me.email = (stored && stored.email) || p.email || '';
+      me.phoneNumber = (stored && stored.phoneNumber) || '';
+      me.address = (stored && stored.address) || '';
+      me.username = (stored && stored.username) || p.username || '';
+      me.usertype = p.usertype || (stored && stored.usertype) || 'user';
+
+      if (me.id) {
+        try {
+          const r = await api('users/' + me.id);
+          const u = r.user || r.data || r;
+          if (u && typeof u === 'object' && !Array.isArray(u)) {
+            me = { ...me, ...Object.fromEntries(Object.entries(u).filter(([, v]) => v != null && typeof v !== 'object')) };
+            me.id = u._id || me.id;
+          }
+        } catch (e) { /* profile endpoint is optional */ }
+      }
+      $('#sideName').textContent = me.name;
+      $('#sideAvatar').textContent = initials(me.name);
+    }
+
+    /* ---------- Shell ---------- */
+    const TITLES = {
+      dashboard: ['Dashboard', 'Your bookings and venues at a glance'],
+      auditoriums: ['Auditoriums', 'Browse halls and book your next event'],
+      events: ['Events', 'Shows and programs hosted at our venues'],
+      bookings: ['My Bookings', 'Track and manage your reservations'],
+      profile: ['My Profile', 'Your account details']
+    };
+
+    function buildNav() {
+      document.querySelectorAll('aside nav button[data-page]').forEach(b => {
+        const p = b.dataset.page;
+        b.innerHTML = `${ICON[p]}<span>${p === 'bookings' ? 'My Bookings' : p === 'profile' ? 'My Profile' : p.charAt(0).toUpperCase() + p.slice(1)}</span><span class="count" id="count-${p}" hidden></span>`;
+      });
+      $('#logoutButton').innerHTML = `${ICON.logout}<span>Logout</span>`;
+      $('#menuButton').innerHTML = ICON.menu;
+    }
+
+    function updateCounts() {
+      const map = { auditoriums: data.auditoriums.length, events: data.events.length, bookings: myBookings().length };
+      Object.entries(map).forEach(([k, v]) => {
+        const el = $('#count-' + k);
+        if (el) { el.textContent = v; el.hidden = false; }
+      });
+    }
+
+    function applyTheme(t) {
+      document.documentElement.setAttribute('data-theme', t);
+      localStorage.setItem('theme', t);
+      $('#themeButton').innerHTML = t === 'dark' ? ICON.sun : ICON.moon;
+    }
+
+    function closeSidebar() {
+      $('#sidebar').classList.remove('open');
+      $('#scrim').classList.remove('show');
+    }
+
+    const skeleton = () => `<div class="stats">${'<div class="skel"></div>'.repeat(4)}</div><div class="skel" style="min-height:260px"></div>`;
+
+    const errorCard = (title, msg, retry) => `
+      <div class="card empty" style="max-width:520px;margin:30px auto">
+        ${ICON.warn}
+        <h3 class="serif" style="font-size:20px">${escapeHTML(title)}</h3>
+        <p style="color:var(--red);margin-bottom:8px">${escapeHTML(msg)}</p>
+        <p style="margin-bottom:16px">Check that the backend is running and that the API route exists.</p>
+        ${retry ? `<button onclick="${retry}">Try Again</button>` : ''}
+      </div>`;
+
+    /* ---------- Start ---------- */
+    async function start() {
+      buildNav();
+      applyTheme(localStorage.getItem('theme') || 'dark');
+      $('#app').hidden = false;
+
+      if (!token) {
+        $('#sidebar').style.display = 'none';
+        $('#menuButton').style.display = 'none';
+        $('#pageTitle').textContent = 'Login Required';
+        $('#pageSub').textContent = 'Please sign in to continue';
+        $('#view').innerHTML = `
+          <div class="card empty" style="max-width:480px;margin:40px auto">
+            ${ICON.warn}
+            <h3 class="serif" style="font-size:22px">Please log in</h3>
+            <p style="margin-bottom:16px">You need to be signed in to view your dashboard.</p>
+            <button onclick="window.location.href='/'">Go to Login</button>
+          </div>`;
+        return;
+      }
+
+      await loadProfile();
+      await showPage('dashboard');
+    }
+
+    async function showPage(page, force = true) {
+      currentPage = page;
+      ui.search = '';
+      ui.filter = '';
+      closeSidebar();
+
+      document.querySelectorAll('aside nav button[data-page]').forEach(b =>
+        b.classList.toggle('active', b.dataset.page === page));
+      $('#pageTitle').textContent = TITLES[page][0];
+      $('#pageSub').textContent = TITLES[page][1];
+      window.scrollTo({ top: 0 });
+
+      try {
+        if (force || !data.auditoriums.length) {
+          $('#view').innerHTML = skeleton();
+          await loadAll();
+        }
+        updateCounts();
+        if (page === 'dashboard') renderDashboard();
+        else if (page === 'auditoriums') renderAuditoriums();
+        else if (page === 'events') renderEvents();
+        else if (page === 'bookings') renderBookings();
+        else renderProfile();
+      } catch (e) {
+        $('#view').innerHTML = errorCard(TITLES[page][0], e.message, `showPage('${page}')`);
+      }
+    }
+
+    /* ---------- Toolbar ---------- */
+    function makeToolbar(placeholder, options, label) {
+      return `
+        <div class="toolbar">
+          <div class="search">${ICON.search}<input id="searchBox" type="search" placeholder="${escapeHTML(placeholder)}"></div>
+          ${options.length ? `
+            <select id="filterBox">
+              <option value="">${escapeHTML(label)}</option>
+              ${options.map(o => `<option value="${escapeHTML(o)}">${escapeHTML(o)}</option>`).join('')}
+            </select>` : ''}
+        </div>
+        <div id="listArea"></div>`;
+    }
+
+    function wireToolbar(renderFn) {
+      $('#searchBox').addEventListener('input', e => { ui.search = e.target.value; renderFn(); });
+      const fb = $('#filterBox');
+      if (fb) fb.addEventListener('change', e => { ui.filter = e.target.value; renderFn(); });
+    }
+
+    function matches(r, statusKey) {
+      if (ui.filter && lower(r[statusKey]) !== lower(ui.filter)) return false;
+      const q = ui.search.trim().toLowerCase();
+      if (!q) return true;
+      return JSON.stringify(r).toLowerCase().includes(q);
+    }
+
+    const emptyCard = (title, text) => `
+      <div class="card empty">${ICON.empty}<h3>${escapeHTML(title)}</h3><p>${escapeHTML(text)}</p></div>`;
+
+    /* ---------- Dashboard ---------- */
+    function renderDashboard() {
+      const my = myBookings();
+      const today = todayISO();
+      const upcoming = my
+        .filter(b => lower(b.status) !== 'cancelled' && dayISO(b.bookingDate) >= today)
+        .sort((a, b) => dayISO(a.bookingDate).localeCompare(dayISO(b.bookingDate)));
+      const pending = my.filter(b => lower(b.status) === 'pending').length;
+      const available = data.auditoriums.filter(a => lower(a.status) !== 'inactive');
+      const liveEvents = data.events.filter(e => ['upcoming', 'ongoing'].includes(lower(e.status))).slice(0, 4);
+      const next = upcoming[0];
+      const hour = new Date().getHours();
+      const greet = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+
+      const stats = [
+        ['My Bookings', my.length, 'bookings', '#d4a24c', 'rgba(212,162,76,.16)', 'bookings'],
+        ['Upcoming', upcoming.length, 'bookings', '#34d399', 'rgba(52,211,153,.15)', 'clock'],
+        ['Pending', pending, 'bookings', '#fbbf24', 'rgba(251,191,36,.15)', 'warn'],
+        ['Available Halls', available.length, 'auditoriums', '#c084fc', 'rgba(192,132,252,.15)', 'auditoriums']
+      ];
+
+      let nextHTML = '<div class="empty" style="padding:24px 0">No upcoming bookings yet.</div>';
+      if (next) {
+        const d = new Date(next.bookingDate);
+        nextHTML = `
+          <div class="next">
+            <div class="date"><div><b>${isNaN(d) ? '-' : d.getDate()}</b><small>${isNaN(d) ? '' : d.toLocaleString(undefined, { month: 'short' })}</small></div></div>
+            <div style="flex:1;min-width:160px">
+              <h3 class="serif" style="font-size:20px">${escapeHTML((next.auditoriumId && next.auditoriumId.auditoriumName) || 'Auditorium')}</h3>
+              <div class="meta" style="margin-top:8px">
+                <span>${ICON.clock}${escapeHTML(next.time || '-')}</span>
+                <span>${ICON.people}${escapeHTML(next.noOfPeople ?? '-')} people</span>
+                ${next.eventId && next.eventId.eventName ? `<span>${ICON.events}${escapeHTML(next.eventId.eventName)}</span>` : ''}
+              </div>
+            </div>
+            ${badge(next.status)}
+          </div>`;
+      }
+
+      $('#view').innerHTML = `
+        ${me.id ? '' : `<div class="form-err">Could not detect your user ID, so your bookings can't be shown. Make sure login saves <code>userId</code> in localStorage.</div>`}
+        <div class="hero">
+          <div>
+            <h2>${greet}, ${escapeHTML(me.name)}</h2>
+            <p>${upcoming.length ? `You have ${upcoming.length} upcoming booking${upcoming.length > 1 ? 's' : ''}.` : 'You have no upcoming bookings. Find the perfect hall for your next event.'}</p>
+          </div>
+          <button onclick="showPage('auditoriums', false)">${ICON.auditoriums}<span>Browse Auditoriums</span></button>
+        </div>
+
+        <div class="stats">
+          ${stats.map(([t, c, p, col, tint, ic]) => `
+            <div class="card stat" style="--tc:${col};--tint:${tint}" onclick="showPage('${p}', false)">
+              <div class="ico">${ICON[ic]}</div>
+              <div><small>${escapeHTML(t)}</small><b>${c}</b></div>
+            </div>`).join('')}
+        </div>
+
+        <div class="grid-2">
+          <div class="card"><h3>Next Booking</h3><div class="sub">Your closest upcoming reservation</div>${nextHTML}</div>
+          <div class="card">
+            <h3>Upcoming Events</h3><div class="sub">Happening at our venues</div>
+            <div class="mini-list">
+              ${liveEvents.length ? liveEvents.map(e => {
+                const url = imageURL(e);
+                return `
+                  <div class="mini-item">
+                    ${url ? `<img class="thumb" src="${escapeHTML(url)}" alt="">` : `<div class="thumb ph">${ICON.events}</div>`}
+                    <div><b>${escapeHTML(e.eventName)}</b><small>${escapeHTML(e.organizer || '')}</small></div>
+                    ${badge(e.status)}
+                  </div>`;
+              }).join('') : '<div class="empty" style="padding:24px 0">No upcoming events.</div>'}
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Recent Bookings</h3><div class="sub">Your latest reservations</div>
+          ${my.length ? bookingsTable([...my].sort((a, b) => dayISO(b.bookingDate).localeCompare(dayISO(a.bookingDate))).slice(0, 5), false)
+                      : '<div class="empty" style="padding:24px 0">You have not made any bookings yet.</div>'}
+        </div>`;
+    }
+
+    /* ---------- Auditoriums ---------- */
+    function renderAuditoriums() {
+      $('#view').innerHTML = makeToolbar('Search auditoriums...', ['active', 'inactive'], 'All statuses');
+      wireToolbar(drawAuditoriums);
+      drawAuditoriums();
+    }
+
+    function drawAuditoriums() {
+      const list = data.auditoriums.filter(a => matches(a, 'status'));
+      if (!list.length) {
+        $('#listArea').innerHTML = emptyCard('No auditoriums found', data.auditoriums.length ? 'Try a different search or filter.' : 'No auditoriums are available yet.');
+        return;
+      }
+      $('#listArea').innerHTML = `<div class="cards-grid">${list.map(a => {
+        const fac = facilitiesOf(a);
+        const inactive = lower(a.status) === 'inactive';
+        const id = escapeHTML(a._id);
+        return `
+          <div class="card item">
+            ${coverHTML(a, 'auditoriums')}
+            <div class="body">
+              <h3>${escapeHTML(a.auditoriumName)}</h3>
+              <div class="meta">
+                <span>${ICON.pin}${escapeHTML(a.location || '-')}</span>
+                <span>${ICON.people}Capacity: ${escapeHTML(a.capacity ?? '-')}</span>
+              </div>
+              ${fac.length ? `<div class="chips">${fac.slice(0, 4).map(f => `<span class="chip">${escapeHTML(f)}</span>`).join('')}${fac.length > 4 ? `<span class="chip">+${fac.length - 4}</span>` : ''}</div>` : ''}
+              <div class="price">₹${escapeHTML(a.pricePerDay ?? '-')} <small>/ day</small></div>
+            </div>
+            <div class="foot">
+              <button class="secondary sm" onclick="viewAuditorium('${id}')">Details</button>
+              <button class="sm" ${inactive ? 'disabled' : ''} onclick="openBooking('${id}')">${inactive ? 'Unavailable' : 'Book Now'}</button>
+            </div>
+          </div>`;
+      }).join('')}</div>`;
+    }
+
+    function viewAuditorium(id) {
+      const a = data.auditoriums.find(x => x._id === id);
+      if (!a) return;
+      const fac = facilitiesOf(a);
+      const url = imageURL(a);
+      openModal(`
+        ${url ? `<img class="preview" src="${escapeHTML(url)}" alt="">` : ''}
+        <h3>${escapeHTML(a.auditoriumName)}</h3>
+        <div class="sub">${badge(a.status)}</div>
+        <dl class="kv">
+          <dt>Location</dt><dd>${escapeHTML(a.location || '-')}</dd>
+          <dt>Capacity</dt><dd>${escapeHTML(a.capacity ?? '-')} people</dd>
+          <dt>Price</dt><dd>₹${escapeHTML(a.pricePerDay ?? '-')} per day</dd>
+          <dt>Facilities</dt><dd>${fac.length ? fac.map(f => `<span class="chip" style="margin-right:4px">${escapeHTML(f)}</span>`).join('') : '-'}</dd>
+        </dl>
+        <div class="form-actions">
+          <button class="secondary" onclick="closeModal()">Close</button>
+          ${lower(a.status) !== 'inactive' ? `<button onclick="openBooking('${escapeHTML(a._id)}')">Book Now</button>` : ''}
+        </div>`);
+    }
+
+    /* ---------- Events ---------- */
+    function renderEvents() {
+      $('#view').innerHTML = makeToolbar('Search events...', ['upcoming', 'ongoing', 'completed', 'cancelled'], 'All statuses');
+      wireToolbar(drawEvents);
+      drawEvents();
+    }
+
+    function drawEvents() {
+      const list = data.events.filter(e => matches(e, 'status'));
+      if (!list.length) {
+        $('#listArea').innerHTML = emptyCard('No events found', data.events.length ? 'Try a different search or filter.' : 'No events have been added yet.');
+        return;
+      }
+      $('#listArea').innerHTML = `<div class="cards-grid">${list.map(e => {
+        const desc = String(e.description || '');
+        const bookable = ['upcoming', 'ongoing'].includes(lower(e.status));
+        const left = seatsLeft(e);
+        return `
+          <div class="card item">
+            ${coverHTML(e, 'events')}
+            <div class="body">
+              <h3>${escapeHTML(e.eventName)}</h3>
+              <div class="meta">
+                <span>${ICON.user}${escapeHTML(e.organizer || '-')}</span>
+                <span>${ICON.clock}${escapeHTML(e.eventDate ? dateText(e.eventDate) : 'Date TBA')}</span>
+                <span>${ICON.people}${left === null ? (e.seats != null ? escapeHTML(e.seats) + ' seats' : 'Seats N/A') : escapeHTML(left) + ' seats left'}</span>
+              </div>
+              ${desc ? `<p style="color:var(--mut);font-size:13px;margin:8px 0 0">${escapeHTML(desc.slice(0, 90))}${desc.length > 90 ? '…' : ''}</p>` : ''}
+              <div style="margin-top:10px;font-weight:700;color:var(--gold2)">${e.price != null ? '₹' + escapeHTML(e.price) + ' <small style="color:var(--mut);font-weight:400">/ ticket</small>' : 'Free entry'}</div>
+            </div>
+            <div class="foot">
+              <button class="secondary sm" onclick="viewEvent('${escapeHTML(e._id)}')">Details</button>
+              <button class="sm" ${bookable ? '' : 'disabled'} onclick="openEventBooking('${escapeHTML(e._id)}')">${bookable ? 'Book Tickets' : 'Closed'}</button>
+            </div>
+          </div>`;
+      }).join('')}</div>`;
+    }
+
+    function viewEvent(id) {
+      const e = data.events.find(x => x._id === id);
+      if (!e) return;
+      const url = imageURL(e);
+      const bookable = ['upcoming', 'ongoing'].includes(lower(e.status));
+      const left = seatsLeft(e);
+      openModal(`
+        ${url ? `<img class="preview" src="${escapeHTML(url)}" alt="">` : ''}
+        <h3>${escapeHTML(e.eventName)}</h3>
+        <div class="sub">${badge(e.status)}</div>
+        <dl class="kv">
+          <dt>Organizer</dt><dd>${escapeHTML(e.organizer || '-')}</dd>
+          <dt>Date</dt><dd>${escapeHTML(e.eventDate ? dateText(e.eventDate) : 'To be announced')}</dd>
+          <dt>Price</dt><dd>${e.price != null ? '₹' + escapeHTML(e.price) + ' per ticket' : 'Free entry'}</dd>
+          <dt>Seats</dt><dd>${left === null ? (e.seats != null ? escapeHTML(e.seats) : 'Unlimited') : escapeHTML(left) + ' left'}${e.seats ? ` of ${escapeHTML(e.seats)}` : ''}</dd>
+          <dt>About</dt><dd>${escapeHTML(e.description || '-')}</dd>
+        </dl>
+        <div class="form-actions">
+          <button class="secondary" onclick="closeModal()">Close</button>
+          ${bookable && (left === null || left > 0) ? `<button onclick="openEventBooking('${escapeHTML(e._id)}')">${ICON.check}<span>Book Tickets</span></button>` : ''}
+        </div>`);
+    }
+
+    /* ---------- Event ticket booking ---------- */
+    function openEventBooking(eventId) {
+      const e = data.events.find(x => x._id === eventId);
+      if (!e) return;
+      if (!['upcoming', 'ongoing'].includes(lower(e.status))) {
+        toast('This event is not open for booking', 'error');
+        return;
+      }
+      const left = seatsLeft(e);
+      const price = Number(e.price) || 0;
+
+      openModal(`
+        <h3>Book Tickets</h3>
+        <div class="sub">${escapeHTML(e.eventName)}</div>
+        <div id="formErr"></div>
+        <form id="evForm" novalidate>
+          <dl class="kv">
+            <dt>Date</dt><dd>${escapeHTML(e.eventDate ? dateText(e.eventDate) : 'To be announced')}</dd>
+            <dt>Price</dt><dd>${e.price != null ? '₹' + escapeHTML(price) + ' per ticket' : 'Free entry'}</dd>
+            <dt>Seats left</dt><dd>${left === null ? 'Unlimited' : escapeHTML(left)}</dd>
+          </dl>
+          <label>Number of tickets
+            <input type="number" id="evTickets" min="1" step="1" value="1" required>
+          </label>
+          <div id="evWarn" class="form-err" style="display:none"></div>
+          <div class="summary"><span>Tickets: <b id="evCount">1</b></span><b id="evTotal">₹${price}</b></div>
+          <div class="form-actions">
+            <button type="button" class="secondary" onclick="closeModal()">Cancel</button>
+            <button type="submit" id="evSubmit">${ICON.check}<span>Confirm Booking</span></button>
+          </div>
+        </form>`);
+
+      const maxTickets = left === null ? null : Number(left);
+      const input = $('#evTickets');
+      if (maxTickets !== null && maxTickets > 0) input.max = maxTickets;
+
+      const syncEvent = () => {
+        const raw = Number(input.value) || 0;
+        const n = Math.max(1, Math.floor(raw || 1));
+        const over = maxTickets !== null && raw > maxTickets;
+        $('#evCount').textContent = n;
+        $('#evTotal').textContent = '₹' + (price * n);
+        const warn = $('#evWarn');
+        warn.textContent = over ? 'Warning: only ' + maxTickets + ' ticket(s) left for this event.' : '';
+        warn.style.display = over ? 'block' : 'none';
+        $('#evSubmit').disabled = over || maxTickets === 0;
+      };
+      input.addEventListener('input', syncEvent);
+      syncEvent();
+
+      $('#evForm').onsubmit = async ev => {
+        ev.preventDefault();
+        const showErr = m => { $('#formErr').innerHTML = `<div class="form-err">${escapeHTML(m)}</div>`; };
+        const tickets = Math.floor(Number(input.value));
+        if (!me.id) return showErr('Could not detect your user ID. Please log out and log in again.');
+        if (!Number.isInteger(tickets) || tickets < 1) return showErr('Enter a valid number of tickets.');
+        if (maxTickets !== null && tickets > maxTickets) return showErr('Only ' + maxTickets + ' ticket(s) left for this event.');
+
+        const btn = $('#evSubmit');
+        btn.disabled = true;
+        try {
+          const ticket = await api('event-bookings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ eventId: e._id, tickets })
+          });
+          await loadAll();
+          showSuccess('Booking Successful', 'Your event tickets have been booked.', `
+            <div class="form-actions">
+              <button class="secondary" onclick="closeModal()">Close</button>
+              <button onclick="closeModal();showEventTicketById('${escapeHTML(ticket._id || '')}')">View Ticket</button>
+            </div>`);
+        } catch (err) {
+          btn.disabled = false;
+          showErr(err.message);
+        }
+      };
+    }
+
+    function showEventTicketById(id) {
+      const b = data.eventBookings.find(x => String(x._id) === String(id));
+      if (!b) { toast('Could not load this ticket', 'error'); return; }
+      showEventTicket(b);
+    }
+
+    function showEventTicket(b) {
+      if (!b) return;
+      const e = (b.eventId && typeof b.eventId === 'object')
+        ? b.eventId
+        : (data.events.find(x => x._id === idOf(b.eventId)) || {});
+      const payload = b.ref + '|' + (e.eventName || 'Event') + '|' + (e.eventDate || '');
+      openModal(`
+        <h3>Event Ticket</h3>
+        <div class="sub">${escapeHTML(e.eventName || 'Event')}</div>
+        <div class="ticket">
+          <dl class="kv" style="margin-bottom:14px">
+            <dt>Booking ID</dt><dd><b class="ref">${escapeHTML(b.ref || '-')}</b></dd>
+            <dt>Date</dt><dd>${escapeHTML(e.eventDate ? dateText(e.eventDate) : '-')}</dd>
+            <dt>Tickets</dt><dd>${escapeHTML(b.tickets ?? 1)}</dd>
+            <dt>Status</dt><dd>${badge(b.status)}</dd>
+          </dl>
+          <img class="qr" alt="Ticket QR code" src="${qrURL(payload)}" style="width:200px;height:200px" onerror="this.style.display='none'">
+          <div class="sub" style="text-align:center;margin:10px 0 0">Show this QR at the entrance</div>
+        </div>
+        <div class="form-actions">
+          <button class="secondary" onclick="closeModal()">Close</button>
+        </div>`);
+    }
+
+    function cancelEventTicket(id) {
+      openModal(`
+        <div class="confirm-box">
+          <div class="confirm-ico">${ICON.x}</div>
+          <h3>Cancel this ticket booking?</h3>
+          <p>This action cannot be undone.</p>
+          <div class="form-actions">
+            <button class="secondary" onclick="closeModal()">Keep Tickets</button>
+            <button id="evCancelYes" style="background:var(--red);color:#fff">Yes, Cancel</button>
+          </div>
+        </div>`);
+      $('#evCancelYes').onclick = async () => {
+        const btn = $('#evCancelYes');
+        btn.disabled = true;
+        try {
+          await api('event-bookings/' + id + '/cancel', { method: 'PUT' });
+          closeModal();
+          toast('Ticket booking cancelled');
+          await showPage(currentPage);
+        } catch (e) {
+          btn.disabled = false;
+          toast(e.message, 'error');
+        }
+      };
+    }
+
+    /* ---------- Bookings ---------- */
+    function canCancel(b) {
+      if (lower(b.status) === 'cancelled' || lower(b.status) === 'completed') return false;
+      const cutoff = new Date();
+      cutoff.setHours(0, 0, 0, 0);
+      cutoff.setDate(cutoff.getDate() + 2);
+      const bookingDate = new Date(dayISO(b.bookingDate) + 'T00:00:00');
+      return !isNaN(bookingDate.getTime()) && bookingDate >= cutoff;
+    }
+
+    function bookingsTable(list, withActions = true) {
+      return `
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Auditorium</th><th>Date</th><th>Time</th><th>People</th><th>Status</th>${withActions ? '<th>Actions</th>' : ''}
+            </tr></thead>
+            <tbody>
+              ${list.map(b => `
+                <tr>
+                  <td><b>${escapeHTML((b.auditoriumId && b.auditoriumId.auditoriumName) || '-')}</b></td>
+                  <td>${escapeHTML(dateText(b.bookingDate))}</td>
+                  <td>${escapeHTML(b.time || '-')}</td>
+                  <td>${escapeHTML(b.noOfPeople ?? '-')}</td>
+                  <td>${badge(b.status)}</td>
+                  ${withActions ? `<td><div class="actions">
+                    <button class="secondary sm" title="View" onclick="viewBooking('${escapeHTML(b._id)}')">${ICON.eye}</button>
+                    ${canCancel(b) ? `<button class="danger sm" title="Cancel" onclick="confirmCancel('${escapeHTML(b._id)}')">${ICON.x}</button>` : ''}
+                  </div></td>` : ''}
+                </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>`;
+    }
+
+    function eventTicketsTable(list) {
+      if (!list.length) return '';
+      return `
+        <div class="card table-wrap" style="margin-top:16px">
+          <h3 style="margin-bottom:4px">Event Tickets</h3>
+          <div class="sub" style="margin-bottom:10px">Music shows, performances and other events</div>
+          <table>
+            <thead><tr>
+              <th>Booking ID</th><th>Event</th><th>Date</th><th>Tickets</th><th>Status</th><th>Actions</th>
+            </tr></thead>
+            <tbody>
+              ${list.map(t => `
+                <tr>
+                  <td><b class="ref">${escapeHTML(t.ref || '-')}</b></td>
+                  <td>${escapeHTML((t.eventId && t.eventId.eventName) || '-')}</td>
+                  <td>${escapeHTML(t.eventId && t.eventId.eventDate ? dateText(t.eventId.eventDate) : '-')}</td>
+                  <td>${escapeHTML(t.tickets ?? 1)}</td>
+                  <td>${badge(t.status)}</td>
+                  <td><div class="actions">
+                    <button class="secondary sm" title="View ticket" onclick="showEventTicketById('${escapeHTML(t._id)}')">${ICON.eye}</button>
+                    ${lower(t.status) !== 'cancelled' ? `<button class="danger sm" title="Cancel" onclick="cancelEventTicket('${escapeHTML(t._id)}')">${ICON.x}</button>` : ''}
+                  </div></td>
+                </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>`;
+    }
+
+    function renderBookings() {
+      $('#view').innerHTML = makeToolbar('Search my bookings...', ['booked', 'pending', 'cancelled'], 'All statuses');
+      wireToolbar(drawBookings);
+      drawBookings();
+    }
+
+    function drawBookings() {
+      const all = myBookings();
+      const list = all.filter(b => matches(b, 'status'))
+        .sort((a, b) => dayISO(b.bookingDate).localeCompare(dayISO(a.bookingDate)));
+      const allTickets = myEventTickets();
+      const tickets = allTickets.filter(t => matches(t, 'status'));
+
+      if (!list.length && !tickets.length) {
+        $('#listArea').innerHTML = emptyCard('No bookings found',
+          !me.id ? 'Could not detect your user ID. Make sure login saves userId.' :
+          all.length ? 'Try a different search or filter.' : 'You have not made any bookings yet. Browse auditoriums or events to get started.');
+        return;
+      }
+      $('#listArea').innerHTML = `
+        <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+          <button class="secondary sm" id="clearBookingFilters">Clear Booking Details</button>
+        </div>
+        ${list.length ? `<div class="card table-wrap">${bookingsTable(list)}<div class="table-foot">Showing ${list.length} of ${all.length} bookings</div></div>` : ''}
+        ${eventTicketsTable(tickets)}`;
+      const cbf = $('#clearBookingFilters');
+      if (cbf) cbf.onclick = () => { ui.search=''; ui.filter=''; const sb=$('#searchBox'); if(sb) sb.value=''; const fb=$('#filterBox'); if(fb) fb.value=''; drawBookings(); };
+    }
+
+    function viewBooking(id) {
+      const b = data.bookings.find(x => x._id === id);
+      if (!b) return;
+      openModal(`
+        <h3>Booking Details</h3>
+        <div class="sub">${badge(b.status)}</div>
+        <dl class="kv">
+          <dt>Auditorium</dt><dd>${escapeHTML((b.auditoriumId && b.auditoriumId.auditoriumName) || '-')}</dd>
+          <dt>Date</dt><dd>${escapeHTML(dateText(b.bookingDate))}</dd>
+          <dt>Time</dt><dd>${escapeHTML(b.time || '-')}</dd>
+          <dt>People</dt><dd>${escapeHTML(b.noOfPeople ?? '-')}</dd>
+        </dl>
+        <div class="form-actions">
+          <button class="secondary" onclick="closeModal()">Close</button>
+          ${canCancel(b) ? `<button class="danger" onclick="confirmCancel('${escapeHTML(b._id)}')">Cancel Booking</button>` : ''}
+        </div>`);
+    }
+
+    function confirmCancel(id) {
+      openModal(`
+        <div class="confirm-box">
+          <div class="confirm-ico">${ICON.x}</div>
+          <h3>Cancel this booking?</h3>
+          <p>This action cannot be undone.</p>
+          <div class="form-actions">
+            <button class="secondary" onclick="closeModal()">Keep Booking</button>
+            <button id="cancelYes" style="background:var(--red);color:#fff">Yes, Cancel</button>
+          </div>
+        </div>`);
+      $('#cancelYes').onclick = async () => {
+        const btn = $('#cancelYes');
+        btn.disabled = true;
+        try {
+          await api('bookings/' + id + '/cancel', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: 'cancelled' })
+          });
+          closeModal();
+          toast('Booking cancelled');
+          await showPage(currentPage);
+        } catch (e) {
+          btn.disabled = false;
+          toast(e.message, 'error');
+        }
+      };
+    }
+
+    /* ---------- New booking ---------- */
+    const TIME_SLOTS = (() => {
+      const out = [];
+      for (let h = 0; h < 24; h++) {
+        for (const m of [0, 30]) {
+          out.push(String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0'));
+        }
+      }
+      return out;
+    })();
+    const timeOptions = () => '<option value="">Select time</option>' +
+      TIME_SLOTS.map(t => `<option value="${t}">${t}</option>`).join('');
+
+    function openBooking(auditoriumId) {
+      const open = data.auditoriums.filter(a => lower(a.status) !== 'inactive');
+      if (!open.length) { toast('No auditoriums are available right now', 'error'); return; }
+      const selected = open.find(a => a._id === auditoriumId) || open[0];
+
+      openModal(`
+        <h3>Book an Auditorium</h3>
+        <div class="sub">Fill in the details to reserve your date</div>
+        <div id="formErr"></div>
+        <form id="bookForm" novalidate>
+          <label>Auditorium
+            <select id="bkAud">
+              ${open.map(a => `<option value="${escapeHTML(a._id)}" ${a._id === selected._id ? 'selected' : ''}>${escapeHTML(a.auditoriumName)}</option>`).join('')}
+            </select>
+          </label>
+          <div id="bkCalendarWrap" style="margin-bottom:12px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+              <div style="font-weight:600" id="bkCalTitle"></div>
+              <div style="display:flex;gap:6px">
+                <button type="button" class="secondary sm" id="bkCalPrev">&lt;</button>
+                <button type="button" class="secondary sm" id="bkCalNext">&gt;</button>
+              </div>
+            </div>
+            <div id="bkCalendar" style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px"></div>
+            <div style="display:flex;gap:12px;margin-top:8px;font-size:12px">
+              <span><span style="display:inline-block;width:10px;height:10px;background:var(--green);border-radius:2px;margin-right:4px"></span>Available</span>
+              <span><span style="display:inline-block;width:10px;height:10px;background:#fbbf24;border-radius:2px;margin-right:4px"></span>Partial</span>
+              <span><span style="display:inline-block;width:10px;height:10px;background:var(--red);border-radius:2px;margin-right:4px"></span>Booked</span>
+            </div>
+          </div>
+          <input type="hidden" id="bkDate" required>
+          <div style="font-size:13px;margin:6px 0" id="bkSelectedDate">No date selected</div>
+          <div class="form-row">
+            <label>From<select id="bkFromTime" required>${timeOptions()}</select></label>
+            <label>To<select id="bkToTime" required>${timeOptions()}</select></label>
+          </div>
+          <div id="bkAvail" style="margin:6px 0 10px;font-size:13px;font-weight:600"></div>
+          <label>Number of people<input type="number" id="bkPeople" min="1" step="1" value="1" required></label>
+          <div id="bkCapacityWarn" class="form-err" style="display:none"></div>
+          <div class="summary"><span id="bkInfo"></span><b id="bkPrice"></b></div>
+          <div class="form-actions">
+            <button type="button" class="secondary" onclick="closeModal()">Cancel</button>
+            <button type="submit" id="bkSubmit">${ICON.check}<span>Confirm Booking</span></button>
+          </div>
+        </form>`);
+
+      let bkCalMonth = todayISO().slice(0, 7);
+      let bkSelectedDate = '';
+      let bkDateStatus = '';
+
+      const bookingCapacity = () => {
+        const a = data.auditoriums.find(x => x._id === $('#bkAud').value);
+        return a && a.capacity ? Number(a.capacity) : 0;
+      };
+
+      // Warn and block submission when the party is larger than the hall.
+      const updateBookingSubmit = () => {
+        const cap = bookingCapacity();
+        const people = Number($('#bkPeople').value);
+        const over = cap > 0 && Number.isFinite(people) && people > cap;
+        const warn = $('#bkCapacityWarn');
+        if (warn) {
+          warn.textContent = over
+            ? 'Warning: this hall can hold at most ' + cap + ' people. Please lower the number of people.'
+            : '';
+          warn.style.display = over ? 'block' : 'none';
+        }
+        $('#bkSubmit').disabled = !bkSelectedDate || bkDateStatus === 'booked' || over;
+      };
+
+      const refresh = () => {
+        const a = data.auditoriums.find(x => x._id === $('#bkAud').value);
+        if (!a) return;
+        $('#bkInfo').textContent = 'Capacity ' + (a.capacity ?? '-') + ' • per day';
+        $('#bkPrice').textContent = '₹' + (a.pricePerDay ?? '-');
+        $('#bkPeople').max = a.capacity || '';
+        updateBookingSubmit();
+      };
+
+      const shiftMonth = (ym, delta) => {
+        const parts = ym.split('-').map(Number);
+        const d = new Date(parts[0], parts[1] - 1 + delta, 1);
+        return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+      };
+
+      const loadCalendar = async () => {
+        const a = data.auditoriums.find(x => x._id === $('#bkAud').value);
+        if (!a) return;
+        $('#bkCalTitle').textContent = new Date(bkCalMonth + '-01').toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+        $('#bkCalendar').innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--mut)">Loading...</div>';
+        try {
+          const r = await api('auditoriums/' + encodeURIComponent(a._id) + '/availability?month=' + encodeURIComponent(bkCalMonth));
+          const days = (r && r.days) ? r.days : [];
+          const statusMap = {};
+          days.forEach(d => { statusMap[d.date] = d; });
+          const first = new Date(bkCalMonth + '-01');
+          const startWeekday = first.getDay();
+          const today = todayISO();
+          const dim = new Date(Number(bkCalMonth.slice(0,4)), Number(bkCalMonth.slice(5,7)), 0).getDate();
+          const names = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+          let html = names.map(n => '<div style="text-align:center;font-size:11px;color:var(--mut)">' + n + '</div>').join('');
+          for (let i = 0; i < startWeekday; i++) html += '<div></div>';
+          for (let d = 1; d <= dim; d++) {
+            const ds = bkCalMonth + '-' + String(d).padStart(2, '0');
+            const info = statusMap[ds] || { status: 'available' };
+            const color = info.status === 'booked' ? 'var(--red)' : (info.status === 'partial' ? '#fbbf24' : 'var(--green)');
+            const past = ds < today;
+            const disabled = info.status === 'booked' || past;
+            const selected = ds === bkSelectedDate ? 'outline:2px solid var(--gold);outline-offset:-2px;' : '';
+            html += '<button type="button" class="secondary sm" data-date="' + ds + '" style="padding:6px 0;background:' + color + ';color:#fff;opacity:' + (disabled ? '.45' : '1') + ';' + selected + '" ' + (disabled ? 'disabled' : '') + '>' + d + '</button>';
+          }
+          $('#bkCalendar').innerHTML = html;
+          $('#bkCalendar').querySelectorAll('button[data-date]').forEach(btn => {
+            btn.addEventListener('click', () => {
+              const ds = btn.dataset.date;
+              selectDate(ds, statusMap[ds] || { status: 'available' });
+            });
+          });
+        } catch (e) {
+          $('#bkCalendar').innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--red)">Could not load calendar</div>';
+        }
+      };
+
+      function selectDate(date, info) {
+        bkSelectedDate = date;
+        $('#bkDate').value = date;
+        $('#bkSelectedDate').textContent = 'Selected date: ' + dateText(date);
+        const el = $('#bkAvail');
+        const s = info ? info.status : 'available';
+        bkDateStatus = s;
+        if (s === 'booked') {
+          el.textContent = 'Already fully booked';
+          el.style.color = 'var(--red)';
+        } else if (s === 'partial') {
+          el.textContent = 'Partially booked - pick a free time' + (info && info.slots && info.slots.length ? ' (booked: ' + info.slots.map(x => (x.fromTime || '?') + '-' + (x.toTime || '?')).join(', ') + ')' : '');
+          el.style.color = '#fbbf24';
+        } else {
+          el.textContent = 'Available';
+          el.style.color = 'var(--green)';
+        }
+        loadCalendar();
+        updateBookingSubmit();
+      }
+
+      $('#bkCalPrev').addEventListener('click', () => { bkCalMonth = shiftMonth(bkCalMonth, -1); loadCalendar(); });
+      $('#bkCalNext').addEventListener('click', () => { bkCalMonth = shiftMonth(bkCalMonth, 1); loadCalendar(); });
+      $('#bkAud').addEventListener('change', () => { refresh(); loadCalendar(); });
+      $('#bkPeople').addEventListener('input', updateBookingSubmit);
+      refresh();
+      loadCalendar();
+
+
+      $('#bookForm').onsubmit = async ev => {
+        ev.preventDefault();
+        const a = data.auditoriums.find(x => x._id === $('#bkAud').value);
+        const date = $('#bkDate').value;
+        const people = Number($('#bkPeople').value);
+        const showErr = m => { $('#formErr').innerHTML = `<div class="form-err">${escapeHTML(m)}</div>`; };
+
+        if (!me.id) return showErr('Could not detect your user ID. Please log out and log in again.');
+        if (!date) return showErr('Please choose a date.');
+        if (date < todayISO()) return showErr('The date cannot be in the past.');
+        const from = $('#bkFromTime').value;
+        const to = $('#bkToTime').value;
+        if (!from || !to) return showErr('Please choose from and to times.');
+        if (from >= to) return showErr('End time must be after start time.');
+        if (!Number.isInteger(people) || people < 1) return showErr('Enter a valid number of people.');
+        if (a && a.capacity && people > Number(a.capacity)) return showErr('Warning: this hall can hold at most ' + a.capacity + ' people. Please lower the number of people.');
+
+        const toMins = t => { const p = String(t).split(':').map(Number); return p[0]*60 + (p[1]||0); };
+        const newStart = toMins(from);
+        const newEnd = toMins(to);
+        const clash = data.bookings.some(b => {
+          if (String(idOf(b.auditoriumId)) !== String(a._id)) return false;
+          if (dayISO(b.bookingDate) !== date) return false;
+          if (lower(b.status) === 'cancelled') return false;
+          let es = toMins(b.fromTime), ee = toMins(b.toTime);
+          if (es === null || ee === null) {
+            if (b.time && String(b.time).includes('-')) {
+              const parts = String(b.time).split('-').map(x => x.trim());
+              es = toMins(parts[0]); ee = toMins(parts[1]);
+            }
+          }
+          if (es === null || ee === null || ee <= es) { es = 0; ee = 24*60; }
+          return es < newEnd && newStart < ee;
+        });
+        if (clash) return showErr('This auditorium is already booked for the selected time. Please pick another time.');
+
+        const payload = {
+          userId: me.id,
+          auditoriumId: a._id,
+          bookingDate: date,
+          fromTime: from,
+          toTime: to,
+          time: from + ' - ' + to,
+          noOfPeople: people,
+          status: 'booked'
+        };
+
+        const btn = $('#bkSubmit');
+        btn.disabled = true;
+        try {
+          await api('bookings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          await loadAll();
+          showSuccess('Booking Successful', 'Your auditorium booking has been confirmed.', `
+            <div class="form-actions">
+              <button class="secondary" onclick="closeModal()">Close</button>
+              <button onclick="closeModal();showPage('bookings')">View My Bookings</button>
+            </div>`);
+        } catch (e) {
+          btn.disabled = false;
+          showErr(e.message);
+        }
+      };
+    }
+
+    /* ---------- Profile ---------- */
+    function renderProfile() {
+      const my = myBookings();
+      const rows = [
+        ['Full name', me.name], ['Email', me.email], ['Phone', me.phoneNumber],
+        ['Address', me.address], ['Username', me.username], ['Account type', me.usertype]
+      ];
+      $('#view').innerHTML = `
+        <div class="profile">
+          <div class="card profile-card">
+            <div class="avatar wine big">${escapeHTML(initials(me.name))}</div>
+            <h3>${escapeHTML(me.name)}</h3>
+            <p>${escapeHTML(me.email || me.username || '')}</p>
+            <div style="margin-top:16px">${badge(me.usertype || 'user')}</div>
+          </div>
+          <div class="card">
+            <h3>Account Details</h3><div class="sub">Information saved on your account</div>
+            <dl class="kv">${rows.map(([k, v]) => `<dt>${escapeHTML(k)}</dt><dd>${escapeHTML(v || '-')}</dd>`).join('')}</dl>
+            <h3 style="margin-top:8px">Activity</h3><div class="sub">Your booking summary</div>
+            <dl class="kv" style="margin-bottom:0">
+              <dt>Total</dt><dd>${my.length}</dd>
+              <dt>Confirmed</dt><dd>${my.filter(b => ['booked', 'confirmed'].includes(lower(b.status))).length}</dd>
+              <dt>Pending</dt><dd>${my.filter(b => lower(b.status) === 'pending').length}</dd>
+              <dt>Cancelled</dt><dd>${my.filter(b => lower(b.status) === 'cancelled').length}</dd>
+            </dl>
+          </div>
+        </div>`;
+    }
+
+    /* ---------- Modal ---------- */
+    function openModal(html) { $('#modalContent').innerHTML = html; $('#modal').hidden = false; }
+    function closeModal() { $('#modal').hidden = true; $('#modalContent').innerHTML = ''; }
+
+    // Success popup with an animated checkmark tick.
+    function showSuccess(title, message, actions) {
+      openModal(`
+        <div class="success-box">
+          <svg class="success-check" viewBox="0 0 52 52" aria-hidden="true">
+            <circle class="ring" cx="26" cy="26" r="24"></circle>
+            <path class="tick" d="M15 27l7 7 15-16"></path>
+          </svg>
+          <h3>${escapeHTML(title)}</h3>
+          <p>${escapeHTML(message || '')}</p>
+          ${actions || `<div class="form-actions"><button onclick="closeModal()">Done</button></div>`}
+        </div>`);
+    }
+
+    /* ---------- Events ---------- */
+    document.querySelectorAll('aside nav button[data-page]').forEach(b =>
+      b.addEventListener('click', () => showPage(b.dataset.page)));
+    $('#logoutButton').addEventListener('click', logout);
+    $('#themeButton').addEventListener('click', () =>
+      applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'));
+    $('#menuButton').addEventListener('click', () => {
+      $('#sidebar').classList.add('open');
+      $('#scrim').classList.add('show');
+    });
+    $('#scrim').addEventListener('click', closeSidebar);
+    $('#modal').addEventListener('click', e => { if (e.target.id === 'modal') closeModal(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+    start();
+  </script>
+</body>
+</html>
